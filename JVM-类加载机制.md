@@ -320,3 +320,6 @@ android.support.v4.view.ViewPager can not be cast to android.support.v4.view.Vie
 Class.forName
 Class.forName是一个静态方法，同样可以用来加载类。该方法有两种形式：Class.forName(String name, boolean initialize, ClassLoader loader)和 Class.forName(String className)。第一种形式的参数 name表示的是类的全名；initialize表示是否初始化类；loader表示加载时使用的类加载器。第二种形式则相当于设置了参数 initialize的值为 true，loader的值为当前类的类加载器。Class.forName的一个很常见的用法是在加载数据库驱动的时候。如 Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance()用来加载 Apache Derby 数据库的驱动。
 在介绍完类加载器相关的基本概念之后，下面介绍如何开发自己的类加载器。
+
+
+### 参考资料：
