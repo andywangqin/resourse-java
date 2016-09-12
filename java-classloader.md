@@ -9,7 +9,7 @@
 
 ### 3、类的生命周期
 类从被加载到虚拟机内存中开始，直到卸载出内存为止，它的整个生命周期包括了：加载、验证、准备、解析、初始化、使用和卸载这7个阶段。其中，验证、准备和解析这三个部分统称为连接（linking）。
-![](\\image\\20140317163048593.jpg)
+![](/image/20140317163048593.jpg)
 其中，加载、验证、准备、初始化和卸载这五个阶段的顺序是确定的，类的加载过程必须按照这种顺序按部就班的“开始”（仅仅指的是开始，而非执行或者结束，因为这些阶段通常都是互相交叉的混合进行，通常会在一个阶段执行的过程中调用或者激活另一个阶段），而解析阶段则不一定（它在某些情况下可以在初始化阶段之后再开始，这是为了支持Java语言的运行时绑定）。
 
 ### 4、类的加载过程
@@ -300,7 +300,7 @@ android.support.v4.view.ViewPager can not be cast to android.support.v4.view.Vie
  
 加载不同 Jar 包中公共类：
 现在 Host 工程包含了 common.jar, jar1.jar, jar2.jar，并且 jar1.jar 和 jar2.jar 都包含了 common.jar，我们通过 ClassLoader 将 jar1, jar2 动态加载进来，这样在 Host 中实际是存在三份 common.jar，如下图：
-![](\\image\\14301963930_2f0f0fe8aa_o.png)
+![](/image/14301963930_2f0f0fe8aa_o.png)
 我们怎么保证 common.jar 只有一份而不会造成上面3中提到的 ClassLoader 隔离的问题呢，其实很简单，在生成 jar1 和 jar2 时把 common.jar 去掉，只保留 host 中一份，以 host ClassLoader 为 parentClassLoader 即可。
 
 ##### 6.3、常见问题
