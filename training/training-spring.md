@@ -4,7 +4,7 @@
 - 依赖注入（DI）: 控制反转（IoC）是一个通用的概念，它可以用许多不同的方式去表达，依赖注入仅仅是控制反转的一个具体的例子。
 - 面向方面的程序设计（AOP）
 
-![](/image/arch1.png)
+![](../image/arch1.png)
 
 #### 1.2、IoC 容器
 Spring 容器是 Spring 框架的核心。容器将创建对象，把它们连接在一起，配置它们，并管理他们的整个生命周期从创建到销毁。Spring 提供了以下两种不同类型的容器：
@@ -184,7 +184,7 @@ public interface TransactionDefinition {
 
 #### 1.8、Spring mvc
 ##### 1.8.1、DispatcherServlet
-![](/image/mvc1.png)
+![](../image/mvc1.png)
 
 下面是对应于 DispatcherServlet 传入 HTTP 请求的事件序列：
 
