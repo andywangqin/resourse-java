@@ -2,19 +2,17 @@
 ---
 #### 1.1、spring体系结构
 - 依赖注入（DI）: 控制反转（IoC）是一个通用的概念，它可以用许多不同的方式去表达，依赖注入仅仅是控制反转的一个具体的例子。
-- 面向方面的程序设计（AOP）
+- 面向切面的程序设计（AOP）
 
 ![](../image/arch1.png)
 
 #### 1.2、IoC 容器
 Spring 容器是 Spring 框架的核心。容器将创建对象，把它们连接在一起，配置它们，并管理他们的整个生命周期从创建到销毁。Spring 提供了以下两种不同类型的容器：
 
-|序号	|容器 & 描述|
-| ------------- |:-------------:|
-|1	|Spring BeanFactory 容器
-它是最简单的容器，给 DI 提供了基本的支持，它用 org.springframework.beans.factory.BeanFactory 接口来定义。BeanFactory 或者相关的接口，如 BeanFactoryAware，InitializingBean，DisposableBean，在 Spring 中仍然存在具有大量的与 Spring 整合的第三方框架的反向兼容性的目的。|
-|2	|Spring ApplicationContext 容器
-该容器添加了更多的企业特定的功能，例如从一个属性文件中解析文本信息的能力，发布应用程序事件给感兴趣的事件监听器的能力。该容器是由 org.springframework.context.ApplicationContext 接口定义。|
+|序号	|容器 | 描述|
+| ------------- |:-------------:|-------------:|
+|1	|Spring BeanFactory 容器|它是最简单的容器，给 DI 提供了基本的支持，它用 org.springframework.beans.factory.BeanFactory 接口来定义。BeanFactory 或者相关的接口，如 BeanFactoryAware，InitializingBean，DisposableBean，在 Spring 中仍然存在具有大量的与 Spring 整合的第三方框架的反向兼容性的目的。|
+|2	|Spring ApplicationContext 容器|该容器添加了更多的企业特定的功能，例如从一个属性文件中解析文本信息的能力，发布应用程序事件给感兴趣的事件监听器的能力。该容器是由 org.springframework.context.ApplicationContext 接口定义。|
 
 ApplicationContext 包含 BeanFactory 所有的功能，一般情况下，相对于 BeanFactory，ApplicationContext 会被推荐使用。BeanFactory 仍然可以在轻量级应用中使用，比如移动设备或者基于 applet 的应用程序。
 
