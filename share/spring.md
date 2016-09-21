@@ -98,7 +98,6 @@ BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供�
 |4	|JSR-250 Annotations,Spring 支持 JSR-250 的基础的注解，其中包括了 @Resource，@PostConstruct 和 @PreDestroy 注解。|
 
 ##### 1.4.4、Spring组件扫描
-<context:component-scan/>:
 ```xml
 <context:component-scan base-package="com.xhlx.finance.budget" > 
      <context:include-filter type="regex" expression=".service.*"/> 
@@ -151,6 +150,7 @@ Spring 切面可以使用下面提到的五种通知工作：
 ##### 1.6.1、XML Schema based
 基于 AOP 的 XML 架构的示例:
 1. 这里是 Logging.java 文件的内容。这实际上是 aspect 模块的一个示例，它定义了在各个点调用的方法。
+
 ```
 package com.tutorialspoint;
 public class Logging {
@@ -185,6 +185,7 @@ public class Logging {
 }
 ```
 2. 下面是 Student.java 文件的内容：
+
 ```
 package com.tutorialspoint;
 public class Student {
@@ -211,6 +212,7 @@ public class Student {
 }
 ```
 3. 下面是 MainApp.java 文件的内容：
+
 ```
 package com.tutorialspoint;
 import org.springframework.context.ApplicationContext;
@@ -227,6 +229,7 @@ public class MainApp {
 }
 ```
 4. 下面是配置文件 Beans.xml：
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
