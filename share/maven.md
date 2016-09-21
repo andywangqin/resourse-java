@@ -1,10 +1,20 @@
 ### 1、maven
 ---
-#### 1.1、maven安装
-略
+#### 1.1、maven安装和配置
+简单讲下maven的安装步骤：
+1. 在安装maven之前，先确保已经安装JDK1.6及以上版本，并且配置好环境变量。
+2. 下载maven3，最新版本是Maven3.1.1 ，下载地址：http://maven.apache.org/download.html,下载apache-maven-3.1.1-bin.zip文件后，并解压到  D:\maven\apache-maven-3.1.1
+3. 配置maven3的环境变量：先配置M2_HOME的环境变量，新建一个系统变量：M2_HOME , 路径是：D:\cloud_cms\maven\apache-maven-3.1.1,再配置path环境变量，在path值的末尾添加"%M2_HOME%\bin"
+4. 点击确定之后，打开cmd窗口：输入 mvn -version,验证是否安装成功。
+
+给maven添加本地仓库
+1. 打开本地maven安装目录,比如我的本地存放目录是：D:\Util\maven\apache-maven-3.1.1
+2. 打开conf文件夹下的settings.xml文件，找到第53行，把注释去掉，修改成：
+<localRepository>D:/Util/maven/maven-dependcies</localRepository>
+当然了，前提是在某个路径下，手动建立了一个名为 maven-dependcies的文件夹，然后把本地仓库指向该路径。
 
 #### 1.2、POM基础
-##### 1.2.1、Simple POM
+##### 1.2.1、Simple POM(坐标)
 ![](../image/QQ20160906113324.png)
 
 |节点 |	描述 |
@@ -109,6 +119,7 @@ Maven 仓库有三种类型：
 - 本地（local）
 - 中央（central）:http://search.maven.org/#browse
 - 远程（remote）
+- 私服
 
 ##### 1.4.2、依赖管理
 通过传递依赖，所有被包含的库的图形可能会快速的增长。当重复的库存在时，可能出现的情形将会持续上升。Maven 提供一些功能来控制可传递的依赖的程度。
@@ -152,7 +163,7 @@ maven scope:
 对于快照，每次用户接口团队构建他们的项目时，Maven 将自动获取最新的快照（data-service:1.0-SNAPSHOT）。
 
 #### 1.5、maven插件
-Maven 实际上是一个依赖插件执行的框架，每个任务实际上是由插件完成。
+Maven 实际上是一个依赖插件执行的框架，每个任务实际上是由插件完成：
 
 - 创建 jar 文件
 - 创建 war 文件
@@ -163,6 +174,8 @@ Maven 实际上是一个依赖插件执行的框架，每个任务实际上是�
 
 插件通常提供了一个目标的集合，并且可以使用下面的语法执行：
 mvn [plugin-name]:[goal-name]
+
+使用的插件助手插件：maven-help-plugin
 
 #### 1.6、build配置
 ##### 1.6.1、Build Settings
@@ -252,7 +265,76 @@ pluginManagement的元素的配置和plugins的配置是一样的，只是这里
 - 从网络上获得该文件并且部署该文件到产品线上。
 - 更新文档日期和应用程序的版本号。
 
-#### 1.7、profile
+#### 1.7、maven聚合和继承
+我们使用Maven应用到实际项目的时候，需要将项目分成不同的模块。这个时候，Maven的聚合特性能够把项目的各个模块聚合在一起构件，而Maven的继承特性则能帮助抽取各模块相同的依赖和插件等配置。在简化POM的同时，还能促进各个模块配置的一致性。下面以具体项目来讲解:
+![](../image/223534_0RUu_865771.png)
+user-parent的pom.xml详情如下:
+```xml
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.liangbo.user</groupId>
+  <artifactId>user-parent</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <modules>
+      <module>../user-core</module>
+      <module>../user-dao</module>
+      <module>../user-log</module>
+      <module>../user-service</module>
+  </modules>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <junit.version>4.10</junit.version>
+    <mysql.driver>com.mysql.jdbc.Driver</mysql.driver>
+    <mysql.url>jdbc:mysql://localhost:3306/mysql</mysql.url>
+    <mysql.username>root</mysql.username>
+    <mysql.password>password</mysql.password>
+  </properties>
+  
+  <dependencyManagement>  
+  </dependencyManagement>
+  
+  <build>
+      <pluginManagement>
+      </pluginManagement>
+  </build>
+</project>
+```
+
+下面来看下user-core项目pom.xml的配置:
+```xml
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+      <groupId>com.liangbo.user</groupId>
+      <artifactId>user-parent</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <relativePath>../user-parent/pom.xml</relativePath>
+  </parent> 
+
+  <artifactId>user-core</artifactId>
+  <packaging>jar</packaging>
+
+  <name>user-core</name>
+  <url>http://maven.apache.org</url>
+
+  <dependencies>
+  </dependencies>
+  
+  <build>
+      <plugins>
+      </plugins>
+  </build>
+</project>
+```
+
+#### 1.8、profile
 构建配置文件是一组配置的集合，用来设置或者覆盖 Maven 构建的默认配置,使用构建配置文件，可以为不同的环境定制构建过程，例如 Producation 和 Development 环境，在profile里几乎可以定义所有在pom里的定义的内容（<dependencies>，<properties>，插件配置等等，不过不能再定义他自己了）。当一个profile被激活时，它定义的<dependencies>，<properties>等就会覆盖掉原pom里定义的相同内容，从而可以通过激活不同的profile来使用不同的配置。
 ```xml
 <profiles>

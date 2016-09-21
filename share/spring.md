@@ -126,18 +126,145 @@ Spring 提供了以下的标准事件：
 Spring 中可自定义事件：扩展ApplicationEvent和ApplicationListener
 
 #### 1.6、AOP
-AOP 术语:
+Spring AOP 模块提供拦截器来拦截一个应用程序，例如，当执行一个方法时，你可以在方法执行之前或之后添加额外的功能。AOP 术语:
+
 |项	|描述|
 | ------------- |:-------------:|
-|Aspect	|一个模块具有一组提供横切需求的 APIs。例如，一个日志模块为了记录日志将被 AOP 方面调用。应用程序可以拥有任意数量的方面，这取决于需求。|
-|Join point|	在你的应用程序中它代表一个点，你可以在插件 AOP 方面。你也能说，它是在实际的应用程序中，其中一个操作将使用 Spring AOP 框架。|
-|Advice	|这是实际行动之前或之后执行的方法。这是在程序执行期间通过 Spring AOP 框架实际被调用的代码。|
-|Pointcut	|这是一组一个或多个连接点，通知应该被执行。你可以使用表达式或模式指定切入点正如我们将在 AOP 的例子中看到的。|
-|Introduction	|引用允许你添加新方法或属性到现有的类中。|
-|Target object	|被一个或者多个方面所通知的对象，这个对象永远是一个被代理对象。也称为被通知对象。|
-|Weaving	|Weaving 把方面连接到其它的应用程序类型或者对象上，并创建一个被通知的对象。这些可以在编译时，类加载时和运行时完成。|
+|Join point（连接点）|是程序执行中的一个精确执行点，例如类中的一个方法。它是一个抽象的概念，在实现AOP时，并不需要去定义一个join point。|
+|Point cut（切入点）|本质上是一个捕获连接点的结构。在AOP中，可以定义一个point cut，来捕获相关方法的调用。|
+|Advice（通知）|是point cut的执行代码，是执行“方面”的具体逻辑。|
+|Aspect（切面）|point cut和advice结合起来就是aspect，它类似于OOP中定义的一个类，但它代表的更多是对象间横向的关系。|
+|Introduction（引入）|为对象引入附加的方法或属性，从而达到修改对象结构的目的。有的AOP工具又将其称为mixin。|
+|Target object(目标对象)|被一个或者多个切面所通知的对象，这个对象永远是一个被代理对象。也称为被通知对象。|
+|Weaving（织入）|Weaving 把切面连接到其它的应用程序类型或者对象上，并创建一个被通知的对象的过程。这些可以在编译时，类加载时和运行时完成。|
 
-Spring 支持 @AspectJ annotation style 的方法和基于模式的方法来实现自定义方面:
+Spring 切面可以使用下面提到的五种通知工作：
+
+|项	|描述|
+| ------------- |:-------------:|
+|前置通知	|在一个方法执行之前，执行通知。|
+|后置通知	|在一个方法执行之后，不考虑其结果，执行通知。|
+|返回后通知	|在一个方法执行之后，只有在方法成功完成时，才能执行通知。|
+|抛出异常后通知	|在一个方法执行之后，只有在方法退出抛出异常时，才能执行通知。|
+|环绕通知	|在建议方法调用之前和之后，执行通知。|
+
+##### 1.6.1、XML Schema based
+基于 AOP 的 XML 架构的示例:
+1. 这里是 Logging.java 文件的内容。这实际上是 aspect 模块的一个示例，它定义了在各个点调用的方法。
+```
+package com.tutorialspoint;
+public class Logging {
+   /** 
+    * This is the method which I would like to execute
+    * before a selected method execution.
+    */
+   public void beforeAdvice(){
+      System.out.println("Going to setup student profile.");
+   }
+   /** 
+    * This is the method which I would like to execute
+    * after a selected method execution.
+    */
+   public void afterAdvice(){
+      System.out.println("Student profile has been setup.");
+   }
+   /** 
+    * This is the method which I would like to execute
+    * when any method returns.
+    */
+   public void afterReturningAdvice(Object retVal){
+      System.out.println("Returning:" + retVal.toString() );
+   }
+   /**
+    * This is the method which I would like to execute
+    * if there is an exception raised.
+    */
+   public void AfterThrowingAdvice(IllegalArgumentException ex){
+      System.out.println("There has been an exception: " + ex.toString());   
+   }  
+}
+```
+2. 下面是 Student.java 文件的内容：
+```
+package com.tutorialspoint;
+public class Student {
+   private Integer age;
+   private String name;
+   public void setAge(Integer age) {
+      this.age = age;
+   }
+   public Integer getAge() {
+      System.out.println("Age : " + age );
+      return age;
+   }
+   public void setName(String name) {
+      this.name = name;
+   }
+   public String getName() {
+      System.out.println("Name : " + name );
+      return name;
+   }  
+   public void printThrowException(){
+       System.out.println("Exception raised");
+       throw new IllegalArgumentException();
+   }
+}
+```
+3. 下面是 MainApp.java 文件的内容：
+```
+package com.tutorialspoint;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = 
+             new ClassPathXmlApplicationContext("Beans.xml");
+      Student student = (Student) context.getBean("student");
+      student.getName();
+      student.getAge();      
+      student.printThrowException();
+   }
+}
+```
+4. 下面是配置文件 Beans.xml：
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+    http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd ">
+
+   <aop:config>
+      <aop:aspect id="log" ref="logging">
+         <aop:pointcut id="selectAll" 
+         expression="execution(* com.tutorialspoint.*.*(..))"/>
+         <aop:before pointcut-ref="selectAll" method="beforeAdvice"/>
+         <aop:after pointcut-ref="selectAll" method="afterAdvice"/>
+         <aop:after-returning pointcut-ref="selectAll" 
+                              returning="retVal"
+                              method="afterReturningAdvice"/>
+         <aop:after-throwing pointcut-ref="selectAll" 
+                             throwing="ex"
+                             method="AfterThrowingAdvice"/>
+      </aop:aspect>
+   </aop:config>
+
+   <!-- Definition for student bean -->
+   <bean id="student" class="com.tutorialspoint.Student">
+      <property name="name"  value="Zara" />
+      <property name="age"  value="11"/>      
+   </bean>
+
+   <!-- Definition for logging aspect -->
+   <bean id="logging" class="com.tutorialspoint.Logging"/> 
+
+</beans>
+```
+
+##### 1.6.2、@AspectJ based
 
 #### 1.7、ORM
 ##### 1.7.1、Spring事务管理
