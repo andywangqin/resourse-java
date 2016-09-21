@@ -149,8 +149,7 @@ Spring 切面可以使用下面提到的五种通知工作：
 
 ##### 1.6.1、XML Schema based
 基于 AOP 的 XML 架构的示例:
-1. 这里是 Logging.java 文件的内容。这实际上是 aspect 模块的一个示例，它定义了在各个点调用的方法。
-
+- 1.这里是 Logging.java 文件的内容。这实际上是 aspect 模块的一个示例，它定义了在各个点调用的方法。
 ```
 package com.tutorialspoint;
 public class Logging {
@@ -184,8 +183,7 @@ public class Logging {
    }  
 }
 ```
-2. 下面是 Student.java 文件的内容：
-
+- 2.下面是 Student.java 文件的内容：
 ```
 package com.tutorialspoint;
 public class Student {
@@ -211,8 +209,7 @@ public class Student {
    }
 }
 ```
-3. 下面是 MainApp.java 文件的内容：
-
+- 3.下面是 MainApp.java 文件的内容：
 ```
 package com.tutorialspoint;
 import org.springframework.context.ApplicationContext;
@@ -228,8 +225,7 @@ public class MainApp {
    }
 }
 ```
-4. 下面是配置文件 Beans.xml：
-
+- 4.下面是配置文件 Beans.xml：
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
