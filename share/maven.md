@@ -201,8 +201,7 @@ mvn [plugin-name]:[goal-name]
     </profiles>  
 </project>  
 ```
-1. The BaseBuild Element Set:
-
+- The BaseBuild Element Set:
 ```xml
 <build>
   <defaultGoal>install</defaultGoal>
@@ -215,8 +214,7 @@ mvn [plugin-name]:[goal-name]
 </build>
 ```
 
-2. Resources
-
+- Resources
 ```xml
  <build>
     ...
@@ -240,7 +238,7 @@ mvn [plugin-name]:[goal-name]
   </build>
 ```
 
-3. Plugins和Plugin Management:
+- Plugins和Plugin Management:
 pluginManagement的元素的配置和plugins的配置是一样的，只是这里的配置只是用于集成，在孩子POM中指定使用。
 ```xml
 <build>
@@ -265,7 +263,7 @@ pluginManagement的元素的配置和plugins的配置是一样的，只是这里
   </build>
 ```
 
-4. The Build Element Set:
+- The Build Element Set:
 ```xml
  <build>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
