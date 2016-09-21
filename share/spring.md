@@ -359,7 +359,7 @@ public interface TransactionDefinition {
 - DispatcherServlet 会从 ViewResolver 获取帮助，为请求检取定义视图。
 - 一旦确定视图，DispatcherServlet 将把模型数据传递给视图，最后呈现在浏览器中。
 
-1.  配置DispatcherServlet
+- 1.配置DispatcherServlet
 ```xml
 <servlet>
       <servlet-name>HelloWeb</servlet-name>
@@ -374,7 +374,7 @@ public interface TransactionDefinition {
    </servlet-mapping>
 ```
 
-2. 配置[servlet-name]-servlet.xml
+- 2.配置[servlet-name]-servlet.xml
 ```xml
 <context-param>
    <param-name>contextConfigLocation</param-name>
@@ -387,7 +387,7 @@ public interface TransactionDefinition {
 </listener>
 ```
 
-3. HelloWeb-servlet.xml
+- 3.HelloWeb-servlet.xml
 ```xml
 	<context:component-scan base-package="com.tutorialspoint" />
 
@@ -397,7 +397,7 @@ public interface TransactionDefinition {
    </bean>
 ```
 
-4. 定义控制器
+- 4.定义控制器
 ```
 @Controller
 @RequestMapping("/hello")
@@ -410,7 +410,7 @@ public class HelloController{
 }
 ```
 
-5. 创建 JSP 视图
+- 5.创建 JSP 视图
 ```
 <html>
    <head>

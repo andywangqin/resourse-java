@@ -7,8 +7,6 @@
 依赖注入框架可以创建线程安全的、基于事务的 SqlSession 和映射器（mapper）并将它们直接注入到你的 bean 中，因此可以直接忽略它们的生命周期。如果对如何通过依赖注入框架来使用 MyBatis 感兴趣可以研究一下 MyBatis-Spring 或 MyBatis-Guice 两个子项目。
 SqlSessionFactoryBuilder: SqlSessionFactoryBuilder 实例的最佳范围是方法范围（也就是局部方法变量）;SqlSessionFactory:线程安全的类;SqlSession不是线程安全的
 
-映射器 XML 文件与映射器类
-
 #### 1.2、XML配置
 MyBatis 的配置文件包含了影响 MyBatis 行为甚深的设置（settings）和属性（properties）信息。文档的顶层结构如下：
 ##### 1.2.1、properties
