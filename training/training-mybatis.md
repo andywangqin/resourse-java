@@ -7,22 +7,61 @@
 依赖注入框架可以创建线程安全的、基于事务的 SqlSession 和映射器（mapper）并将它们直接注入到你的 bean 中，因此可以直接忽略它们的生命周期。如果对如何通过依赖注入框架来使用 MyBatis 感兴趣可以研究一下 MyBatis-Spring 或 MyBatis-Guice 两个子项目。
 SqlSessionFactoryBuilder: SqlSessionFactoryBuilder 实例的最佳范围是方法范围（也就是局部方法变量）;SqlSessionFactory:线程安全的类;SqlSession不是线程安全的
 
+映射器 XML 文件与映射器类
+
 #### 1.2、XML配置
 MyBatis 的配置文件包含了影响 MyBatis 行为甚深的设置（settings）和属性（properties）信息。文档的顶层结构如下：
+##### 1.2.1、properties
+这些属性都是可外部配置且可动态替换的，既可以在典型的 Java 属性文件中配置，亦可通过 properties 元素的子元素来传递。例如：
+```xml
+<properties resource="org/mybatis/example/config.properties">
+  <property name="username" value="dev_user"/>
+  <property name="password" value="F2Fa3!33TYyg"/>
+</properties>
+```
+##### 1.2.2、settings
+这是 MyBatis 中极为重要的调整设置，它们会改变 MyBatis 的运行时行为。下表描述了设置中各项的意图、默认值等。
+```xml
+<settings>
+  <setting name="cacheEnabled" value="true"/>
+  <setting name="lazyLoadingEnabled" value="true"/>
+  <setting name="multipleResultSetsEnabled" value="true"/>
+  <setting name="useColumnLabel" value="true"/>
+  <setting name="useGeneratedKeys" value="false"/>
+  <setting name="autoMappingBehavior" value="PARTIAL"/>
+  <setting name="autoMappingUnknownColumnBehavior" value="WARNING"/>
+  <setting name="defaultExecutorType" value="SIMPLE"/>
+  <setting name="defaultStatementTimeout" value="25"/>
+  <setting name="defaultFetchSize" value="100"/>
+  <setting name="safeRowBoundsEnabled" value="false"/>
+  <setting name="mapUnderscoreToCamelCase" value="false"/>
+  <setting name="localCacheScope" value="SESSION"/>
+  <setting name="jdbcTypeForNull" value="OTHER"/>
+  <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>
+</settings>
+```
 
-- configuration 配置
-- properties 属性
-- settings 设置
-- typeAliases 类型命名
-- typeHandlers 类型处理器
-- objectFactory 对象工厂
-- plugins 插件
-- environments 环境
-- environment 环境变量
-- transactionManager 事务管理器
-- dataSource 数据源
-- databaseIdProvider 数据库厂商标识
-- mappers 映射器
+##### 1.2.3、typeAliases
+类型别名是为 Java 类型设置一个短的名字。它只和 XML 配置有关，存在的意义仅在于用来减少类完全限定名的冗余。例如:
+```xml
+<typeAliases>
+  <typeAlias alias="Author" type="domain.blog.Author"/>
+  <typeAlias alias="Blog" type="domain.blog.Blog"/>
+  <typeAlias alias="Comment" type="domain.blog.Comment"/>
+  <typeAlias alias="Post" type="domain.blog.Post"/>
+  <typeAlias alias="Section" type="domain.blog.Section"/>
+  <typeAlias alias="Tag" type="domain.blog.Tag"/>
+</typeAliases>
+```
+##### 1.2.4、typeHandlers
+无论是 MyBatis 在预处理语句（PreparedStatement）中设置一个参数时，还是从结果集中取出一个值时， 都会用类型处理器将获取的值以合适的方式转换成 Java 类型。下表描述了一些默认的类型处理器。
+
+##### 1.2.5、处理枚举类型
+##### 1.2.6、对象工厂（objectFactory）
+##### 1.2.7、插件（plugins）
+##### 1.2.8、配置环境（environments）
+##### 1.2.9、databaseIdProvider
+##### 1.2.10、映射器（mappers）
 
 #### 1.3、Mapper XML 文件
 ##### 1.3.1、select
@@ -229,8 +268,10 @@ bind 元素可以从 OGNL 表达式中创建一个变量并将其绑定到上下
 </select>
 ```
 
-#### 1.6、mybatis-spring
-##### 1.6.1 入门
+### 2、mybatis-spring
+---
+#### 2.1 入门
+使用这个类库中的类, Spring 将会加载必要的 MyBatis 工厂类和 session 类。 这个类库也提供一个简单的方式来注入 MyBatis 数据映射器和 SqlSession 到业务层的bean中。而且它也会处理事务, 翻译 MyBatis 的异常到 Spring 的 DataAccessException 异常(数据访问异常)中。
 Installation:
 ```xml
 <dependency>
@@ -240,7 +281,15 @@ Installation:
 </dependency>
 ```
 
-要和 Spring 一起使用 MyBatis,你需要在 Spring 应用上下文中定义至少两样东西:一个 SqlSessionFactory 和至少一个数据映射器类。
+可以使用 MapperFactoryBean,像下面这样来把接口加入到 Spring 中:
+```xml
+<bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+  <property name="mapperInterface" value="org.mybatis.spring.sample.mapper.UserMapper" />
+  <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+</bean>
+```
+#### 2.2 SqlSessionFactoryBean
+要和 Spring 一起使用 MyBatis,你需要在 Spring 应用上下文中定义至少两样东西:一个 SqlSessionFactory和至少一个数据映射器类。
 在 MyBatis-Spring 中,SqlSessionFactoryBean 是用于创建 SqlSessionFactory 的。要配置这个工厂 bean,放置下面的代码在 Spring 的 XML 配置文件中:
 ```xml
 <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -248,22 +297,40 @@ Installation:
   <property name="mapperLocations" value="classpath*:sample/config/mappers/**/*.xml" />
 </bean>
 ```
-##### 1.6.2 SqlSessionFactoryBean
 
-在 MyBatis 中,你可以使用 SqlSessionFactory 来创建 SqlSession。一旦你获得一个 session 之后,你可以使用它来执行映射语句,提交或回滚连接,最后,当不再需要它的时候, 你可以关闭 session。 使用 MyBatis-Spring 之后, 你不再需要直接使用 SqlSessionFactory 了,因为你的 bean 可以通过一个线程安全的 SqlSession 来注入,基于 Spring 的事务配置 来自动提交,回滚,关闭 session
+Since 1.3.0, configuration property has been added. It can be specified a Configuration instance directly without MyBatis XML configuration file. For example:
+```xml
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+  <property name="dataSource" ref="dataSource" />
+  <property name="configuration">
+    <bean class="org.apache.ibatis.session.Configuration">
+      <property name="mapUnderscoreToCamelCase" value="true"/>
+    </bean>
+  </property>
+</bean>
+```
 
-- SqlSessionTemplate
+#### 2.3 使用 SqlSession
+在 MyBatis 中,你可以使用 SqlSessionFactory 来创建 SqlSession,使用SqlSessionFactoryBuilder来创建SqlSessionFactory,而在 MyBatis-Spring 中,则使用 SqlSessionFactoryBean 来替代SqlSessionFactory。一旦你获得一个 session 之后,你可以使用它来执行映射语句,提交或回滚连接,最后,当不再需要它的时候, 你可以关闭 session。使用 MyBatis-Spring 之后, 你不再需要直接使用 SqlSessionFactory了,因为你的bean可以通过一个线程安全的 SqlSession 来注入,基于 Spring 的事务配置来自动提交,回滚,关闭 session。
+
+##### 2.3.1 SqlSessionTemplate
 SqlSessionTemplate 是 MyBatis-Spring 的核心。 这个类负责管理 MyBatis 的 SqlSession, 调用 MyBatis 的 SQL 方法, 翻译异常。 SqlSessionTemplate 是线程安全的, 可以被多个 DAO 所共享使用。
-
+SqlSessionTemplate 实现了 SqlSession 接口,这就是说,在代码中无需对 MyBatis 的 SqlSession 进行替换。 SqlSessionTemplate 通常是被用来替代默认的 MyBatis 实现的 DefaultSqlSession , 因为模板可以参与到 Spring 的事务中并且被多个注入的映射器类所使用时也是线程安全的。
 ```xml
 <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
   <constructor-arg index="0" ref="sqlSessionFactory" />
 </bean>
 ```
+SqlSessionTemplate 有一个使用 ExecutorType 作为参数的构造方法。这允许你用来 创建对象,比如,一个批量 SqlSession,但是使用了下列 Spring 配置的 XML 文件:
+```xml
+<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+  <constructor-arg index="0" ref="sqlSessionFactory" />
+  <constructor-arg index="1" value="BATCH" />
+</bean>
+```
 
-- SqlSessionDaoSupport
+##### 2.3.2 SqlSessionDaoSupport
 SqlSessionDaoSupport 是 一 个抽象的支持类, 用来为你提供 SqlSession 。 调用 getSqlSession()方法你会得到一个 SqlSessionTemplate,之后可以用于执行SQL方法, 就像下面这样:
-
 ```
 public class UserDaoImpl extends SqlSessionDaoSupport implements UserDao {
   public User getUser(String userId) {
@@ -272,16 +339,103 @@ public class UserDaoImpl extends SqlSessionDaoSupport implements UserDao {
 }
 ```
 
-##### 1.6.3 事务
-标准配置
-要 开 启 Spring 的 事 务 处 理 , 在 Spring 的 XML 配 置 文 件 中 简 单 创 建 一 个 DataSourceTransactionManager 对象:
-```xml
-<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-  <property name="dataSource" ref="dataSource" />
-</bean>
+#### 2.4 注入映射器
+为了代替手工使用 SqlSessionDaoSupport 或 SqlSessionTemplate编写数据访问对象 (DAO)的代码,MyBatis-Spring 提供了一个动态代理的实现:MapperFactoryBean。这个类可以让你直接注入数据映射器接口到你的service层bean中。当使用映射器时,你仅仅如调用你的DAO一样调用它们就可以了,但是你不需要编写任何DAO实现的代码,因为 MyBatis-Spring将会为你创建代理。
+##### 2.4.1 MapperFactoryBean
+##### 2.4.1 MapperScannerConfigurer
+
+#### 2.5 事务
+##### 2.5.1 简介
+spring支持编程式事务管理和声明式事务管理两种方式。编程式事务管理使用TransactionTemplate或者直接使用底层的PlatformTransactionManager。对于编程式事务管理，spring推荐使用TransactionTemplate。声明式事务管理建立在AOP之上的。其本质是对方法前后进行拦截，然后在目标方法开始之前创建或者加入一个事务，在执行完目标方法之后根据执行情况提交或者回滚事务。声明式事务最大的优点就是不需要通过编程的方式管理事务，这样就不需要在业务逻辑代码中掺杂事务管理的代码，只需在配置文件中做相关的事务规则声明(或通过基于@Transactional注解的方式)，便可以将事务规则应用到业务逻辑中。
+
+和编程式事务相比，声明式事务唯一不足地方是，后者的最细粒度只能作用到方法级别，无法做到像编程式事务那样可以作用到代码块级别。但是即便有这样的需求，也存在很多变通的方法，比如，可以将需要进行事务管理的代码块独立为方法等等。
+
+##### 2.5.2 自动提交(AutoCommit
+默认情况下，数据库处于自动提交模式。每一条语句处于一个单独的事务中，在这条语句执行完毕时，如果执行成功则隐式的提交事务，如果执行失败则隐式的回滚事务。
+对于正常的事务管理，是一组相关的操作处于一个事务之中，因此必须关闭数据库的自动提交模式。不过，这个我们不用担心，spring会将底层连接的自动提交特性设置为false。
+org/springframework/jdbc/datasource/DataSourceTransactionManager.java
 ```
+// switch to manual commit if necessary. this is very expensive in some jdbc drivers,
+// so we don't want to do it unnecessarily (for example if we've explicitly
+// configured the connection pool to set it already).
+if (con.getautocommit()) {
+    txobject.setmustrestoreautocommit(true);
+    if (logger.isdebugenabled()) {
+        logger.debug("switching jdbc connection [" + con + "] to manual commit");
+    }
+    con.setautocommit(false);
+}
+```
+
+连接关闭时的是否自动提交?
+当一个连接关闭时，如果有未提交的事务应该如何处理？JDBC规范没有提及，C3P0默认的策略是回滚任何未提交的事务。这是一个正确的策略，但JDBC驱动提供商之间对此问题并没有达成一致。
+C3P0的autoCommitOnClose属性默认是false,没有十分必要不要动它。或者可以显式的设置此属性为false，这样会更明确。
+
+##### 2.5.3 基于注解的声明式事务管理配置
+```xml
+<!-- transaction support-->
+<!-- PlatformTransactionMnager -->
+<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource" />
+</bean>
+<!-- enable transaction annotation support -->
+<tx:annotation-driven transaction-manager="txManager" />
+```
+##### 2.5.4 spring事务特性
+spring所有的事务管理策略类都继承自org.springframework.transaction.PlatformTransactionManager接口
+```
+public interface PlatformTransactionManager {
+ 
+  TransactionStatus getTransaction(TransactionDefinition definition)
+    throws TransactionException;
+ 
+  void commit(TransactionStatus status) throws TransactionException;
+ 
+  void rollback(TransactionStatus status) throws TransactionException;
+}
+```
+1. 事务隔离级别
+隔离级别是指若干个并发的事务之间的隔离程度。TransactionDefinition 接口中定义了五个表示隔离级别的常量：
+
+- TransactionDefinition.ISOLATION_DEFAULT：这是默认值，表示使用底层数据库的默认隔离级别。对大部分数据库而言，通常这值就是TransactionDefinition.ISOLATION_READ_COMMITTED。
+- TransactionDefinition.ISOLATION_READ_UNCOMMITTED：该隔离级别表示一个事务可以读取另一个事务修改但还没有提交的数据。该级别不能防止脏读，不可重复读和幻读，因此很少使用该隔离级别。比如PostgreSQL实际上并没有此级别。
+- TransactionDefinition.ISOLATION_READ_COMMITTED：该隔离级别表示一个事务只能读取另一个事务已经提交的数据。该级别可以防止脏读，这也是大多数情况下的推荐值。
+- TransactionDefinition.ISOLATION_REPEATABLE_READ：该隔离级别表示一个事务在整个过程中可以多次重复执行某个查询，并且每次返回的记录都相同。该级别可以防止脏读和不可重复读。
+- TransactionDefinition.ISOLATION_SERIALIZABLE：所有的事务依次逐个执行，这样事务之间就完全不可能产生干扰，也就是说，该级别可以防止脏读、不可重复读以及幻读。但是这将严重影响程序的性能。通常情况下也不会用到该级别。
+
+2. 事务传播行为
+所谓事务的传播行为是指，如果在开始当前事务之前，一个事务上下文已经存在，此时有若干选项可以指定一个事务性方法的执行行为。在TransactionDefinition定义中包括了如下几个表示传播行为的常量：
+
+- TransactionDefinition.PROPAGATION_REQUIRED：如果当前存在事务，则加入该事务；如果当前没有事务，则创建一个新的事务。这是默认值。
+- TransactionDefinition.PROPAGATION_REQUIRES_NEW：创建一个新的事务，如果当前存在事务，则把当前事务挂起。
+- TransactionDefinition.PROPAGATION_SUPPORTS：如果当前存在事务，则加入该事务；如果当前没有事务，则以非事务的方式继续运行。
+- TransactionDefinition.PROPAGATION_NOT_SUPPORTED：以非事务方式运行，如果当前存在事务，则把当前事务挂起。
+- TransactionDefinition.PROPAGATION_NEVER：以非事务方式运行，如果当前存在事务，则抛出异常。
+- TransactionDefinition.PROPAGATION_MANDATORY：如果当前存在事务，则加入该事务；如果当前没有事务，则抛出异常。
+- TransactionDefinition.PROPAGATION_NESTED：如果当前存在事务，则创建一个事务作为当前事务的嵌套事务来运行；如果当前没有事务，则该取值等价于TransactionDefinition.PROPAGATION_REQUIRED。
+
+3. 事务超时
+所谓事务超时，就是指一个事务所允许执行的最长时间，如果超过该时间限制但事务还没有完成，则自动回滚事务。在 TransactionDefinition 中以 int 的值来表示超时时间，其单位是秒。
+
+默认设置为底层事务系统的超时值，如果底层数据库事务系统没有设置超时值，那么就是none，没有超时限制。
+
+4. 事务只读属性
+只读事务用于客户代码只读但不修改数据的情形，只读事务用于特定情景下的优化，比如使用Hibernate的时候。
+默认为读写事务。
+
+5. spring事务回滚规则
+指示spring事务管理器回滚一个事务的推荐方法是在当前事务的上下文内抛出异常。spring事务管理器会捕捉任何未处理的异常，然后依据规则决定是否回滚抛出异常的事务。
+
+默认配置下，spring只有在抛出的异常为运行时unchecked异常时才回滚该事务，也就是抛出的异常为RuntimeException的子类(Errors也会导致事务回滚)，而抛出checked异常则不会导致事务回滚。
+可以明确的配置在抛出那些异常时回滚事务，包括checked异常。也可以明确定义那些异常抛出时不回滚事务。
+
+还可以编程性的通过setRollbackOnly()方法来指示一个事务必须回滚，在调用完setRollbackOnly()后你所能执行的唯一操作就是回滚。
+
+
 
 参考:
 
 - [mybatis](http://www.mybatis.org/mybatis-3/zh/getting-started.html)
 - [mybatis-spring](http://www.mybatis.org/spring/zh/)
+- [事务基础知识](http://bijian1013.iteye.com/blog/2165007)
+- [spring,mybatis事务管理配置与@Transactional注解使用](http://openwares.net/java/spring_mybatis_transaction.html)
