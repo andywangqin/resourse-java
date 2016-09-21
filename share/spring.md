@@ -52,13 +52,14 @@ bean 是一个被实例化，组装，并通过 Spring IoC 容器所管理的对
 BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供自己的实例化逻辑，依赖解析逻辑等。你也可以在 Spring 容器通过插入一个或多个 BeanPostProcessor 的实现来完成实例化，配置和初始化一个bean之后实现一些自定义逻辑回调方法。
 
 #### 1.4、依赖注入
-
+##### 1.4.1、xml装配
 |序号	|依赖注入类型 & 描述|
 | ------------- |:-------------:|
 |1	Constructor-based dependency injection|当容器调用带有多个参数的构造函数类时，实现基于构造函数的 DI，每个代表在其他类中的一个依赖关系。|
 |2	Setter-based dependency injection|基于 setter 方法的 DI 是通过在调用无参数的构造函数或无参数的静态工厂方法实例化 bean 之后容器调用 beans 的 setter 方法来实现的。|
 
-##### 1.4.1、注入内部 Beans
+- 注入内部 Beans
+ 
 ```xml
 <!-- Definition for textEditor bean using inner bean -->
    <bean id="textEditor" class="com.tutorialspoint.TextEditor">
@@ -68,7 +69,7 @@ BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供�
    </bean>
 ```
 
-##### 1.4.2、注入集合
+- 注入集合
 
 |元素	|描述|
 | ------------- |:-------------:|
@@ -77,7 +78,7 @@ BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供�
 |<map>	|它可以用来注入名称-值对的集合，其中名称和值可以是任何类型。|
 |<props>	|它可以用来注入名称-值对的集合，其中名称和值都是字符串类型。|
 
-##### 1.4.3、Beans 自动装配
+##### 1.4.2、Beans 自动装配
 
 |模式	|描述|
 | ------------- |:-------------:|
@@ -87,7 +88,7 @@ BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供�
 |constructor	|类似于 byType，但该类型适用于构造函数参数类型。如果在容器中没有一个构造函数参数类型的 bean，则一个致命错误将会发生。|
 |autodetect|	Spring首先尝试通过 constructor 使用自动装配来连接，如果它不执行，Spring 尝试通过 byType 来自动装配。|
 
-##### 1.4.4、基于注解的配置
+##### 1.4.3、基于注解的配置
 
 |序号	|注解 & 描述|
 | ------------- |:-------------:|
@@ -96,7 +97,8 @@ BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供�
 |3	|@Qualifier,通过指定确切的将被连线的 bean，@Autowired 和 @Qualifier 注解可以用来删除混乱。|
 |4	|JSR-250 Annotations,Spring 支持 JSR-250 的基础的注解，其中包括了 @Resource，@PostConstruct 和 @PreDestroy 注解。|
 
-Spring组件扫描<context:component-scan/>:
+##### 1.4.4、Spring组件扫描
+<context:component-scan/>:
 ```xml
 <context:component-scan base-package="com.xhlx.finance.budget" > 
      <context:include-filter type="regex" expression=".service.*"/> 
@@ -266,13 +268,15 @@ public class MainApp {
 
 #### 1.7、ORM
 ##### 1.7.1、Spring事务管理
-1. Spring 支持两种类型的事务管理:
+1.Spring 支持两种类型的事务管理:
+
 - 编程式事务管理 ：这意味着你在编程的帮助下有管理事务。这给了你极大的灵活性，但却很难维护。
 - 声明式事务管理 ：这意味着你从业务代码中分离事务管理。你仅仅使用注释或 XML 配置来管理事务。
 
 声明式事务管理比编程式事务管理更可取，尽管它不如编程式事务管理灵活，但它允许你通过代码控制事务。但作为一种横切关注点，声明式事务管理可以使用 AOP 方法进行模块化。Spring 支持使用 Spring AOP 框架的声明式事务管理。
 
-2. Spring 事务抽象
+2.Spring 事务抽象
+
 Spring 事务抽象的关键是由 org.springframework.transaction.PlatformTransactionManager 接口定义，如下所示：
 ```
 public interface PlatformTransactionManager {
@@ -282,6 +286,7 @@ public interface PlatformTransactionManager {
    void rollback(TransactionStatus status) throws TransactionException;
 }
 ```
+
 | 序号	| 方法 & 描述| 
 | ------------- |:-------------:|
 | 1	| TransactionStatus getTransaction(TransactionDefinition definition) 根据指定的传播行为，该方法返回当前活动事务或创建一个新的事务。| 
@@ -298,17 +303,54 @@ public interface TransactionDefinition {
    boolean isReadOnly();
 }
 ```
-下面是隔离级别的可能值:
-| 序号	|隔离 & 描述|
-| ------------- |:-------------:|
-| 1	|TransactionDefinition.ISOLATION_DEFAULT这是默认的隔离级别。|
-| 2	|TransactionDefinition.ISOLATION_READ_COMMITTED表明能够阻止误读；可以发生不可重复读和虚读。|
-| 3	|TransactionDefinition.ISOLATION_READ_UNCOMMITTED表明可以发生误读、不可重复读和虚读。|
-| 4	|TransactionDefinition.ISOLATION_REPEATABLE_READ表明能够阻止误读和不可重复读；可以发生虚读。|
-| 5	|TransactionDefinition.ISOLATION_SERIALIZABLE表明能够阻止误读、不可重复读和虚读。|
 
-#### 1.8、Spring mvc
-##### 1.8.1、DispatcherServlet
+#### 1.8、Spring中的Profile
+由于我们平时在开发中，通常会出现在开发的时候使用一个开发数据库，测试的时候使用一个测试的数据库，而实际部署的时候需要一个数据库。以前的做法是将这些信息写在一个配置文件中，当我把代码部署到测试的环境中，将配置文件改成测试环境；当测试完成，项目需要部署到现网了，又要将配置信息改成现网的，真的好烦。。。而使用了Profile之后，我们就可以分别定义3个配置文件，一个用于开发、一个用户测试、一个用户生产，其分别对应于3个Profile。当在实际运行的时候，只需给定一个参数来激活对应的Profile即可，那么容器就会只加载激活后的配置文件，这样就可以大大省去我们修改配置信息而带来的烦恼。
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <beans profile="dev,test">
+        <context:property-placeholder location="classpath:application.properties" />
+
+        <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+            <property name="driverClass" value="${db.driver}"/>
+            <property name="jdbcUrl" value="${db.url}"/>
+            <property name="username" value="${db.username}"/>
+            <property name="password" value="${db.password}"/>
+            <property name="idleConnectionTestPeriodInMinutes" value="60"/>
+            <property name="idleMaxAgeInMinutes" value="240"/>
+            <property name="maxConnectionsPerPartition" value="30"/>
+            <property name="minConnectionsPerPartition" value="10"/>
+            <property name="partitionCount" value="3"/>
+            <property name="acquireIncrement" value="5"/>
+            <property name="statementsCacheSize" value="100"/>
+            <property name="releaseHelperThreads" value="3"/>
+        </bean>
+    <beans profile="production">
+        <context:property-placeholder ignore-resource-not-found="true" location="classpath:application.properties,classpath:application-production.properties" />
+        
+        <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+            <property name="jndiName" value="${db.jndi}"/>
+        </bean>
+    </beans>
+
+</beans>
+```
+以数据库为例，开发环境使用的是直接将配置写在项目的配置文件里面，而生产环境则使用了jndi。
+
+切换profile可以写在web.xml里面：
+```xml
+<context-param>  
+  <param-name>spring.profiles.active</param-name>  
+  <param-value>dev</param-value>  
+</context-param>
+```
+
+#### 1.9、Spring mvc
+##### 1.9.1、DispatcherServlet
 ![](../image/mvc1.png)
 
 下面是对应于 DispatcherServlet 传入 HTTP 请求的事件序列：
