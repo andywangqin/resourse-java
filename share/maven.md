@@ -2,12 +2,14 @@
 ---
 #### 1.1、maven安装和配置
 简单讲下maven的安装步骤：
+
 1. 在安装maven之前，先确保已经安装JDK1.6及以上版本，并且配置好环境变量。
 2. 下载maven3，最新版本是Maven3.1.1 ，下载地址：http://maven.apache.org/download.html,下载apache-maven-3.1.1-bin.zip文件后，并解压到  D:\maven\apache-maven-3.1.1
 3. 配置maven3的环境变量：先配置M2_HOME的环境变量，新建一个系统变量：M2_HOME , 路径是：D:\cloud_cms\maven\apache-maven-3.1.1,再配置path环境变量，在path值的末尾添加"%M2_HOME%\bin"
 4. 点击确定之后，打开cmd窗口：输入 mvn -version,验证是否安装成功。
 
-给maven添加本地仓库
+给maven设置本地仓库:
+
 1. 打开本地maven安装目录,比如我的本地存放目录是：D:\Util\maven\apache-maven-3.1.1
 2. 打开conf文件夹下的settings.xml文件，找到第53行，把注释去掉，修改成：
 <localRepository>D:/Util/maven/maven-dependcies</localRepository>
