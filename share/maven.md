@@ -4,8 +4,8 @@
 简单讲下maven的安装步骤：
 
 1. 在安装maven之前，先确保已经安装JDK1.6及以上版本，并且配置好环境变量。
-2. 下载maven3，最新版本是Maven3.1.1 ，下载地址：http://maven.apache.org/download.html,下载apache-maven-3.1.1-bin.zip文件后，并解压到  D:\maven\apache-maven-3.1.1
-3. 配置maven3的环境变量：先配置M2_HOME的环境变量，新建一个系统变量：M2_HOME , 路径是：D:\cloud_cms\maven\apache-maven-3.1.1,再配置path环境变量，在path值的末尾添加"%M2_HOME%\bin"
+2. 下载maven3，最新版本是Maven3.3.9 ，下载地址：[](http://maven.apache.org/download.html), 下载apache-maven-3.3.9-bin.zip文件后，并解压到D:\maven\apache-maven-3.3.9
+3. 配置maven3的环境变量：先配置M2_HOME的环境变量，新建一个系统变量：M2_HOME , 路径是：D:\cloud_cms\maven\apache-maven-3.3.9,再配置path环境变量，在path值的末尾添加"%M2_HOME%\bin"
 4. 点击确定之后，打开cmd窗口：输入 mvn -version,验证是否安装成功。
 
 给maven设置本地仓库:
@@ -13,7 +13,7 @@
 1. 打开本地maven安装目录,比如我的本地存放目录是：D:\Util\maven\apache-maven-3.1.1
 2. 打开conf文件夹下的settings.xml文件，找到第53行，把注释去掉，修改成：
 <localRepository>D:/Util/maven/maven-dependcies</localRepository>
-当然了，前提是在某个路径下，手动建立了一个名为 maven-dependcies的文件夹，然后把本地仓库指向该路径。
+当然了，前提是在这个路径下，手动建立了一个名为 maven-dependcies的文件夹，然后把本地仓库指向该路径。
 
 #### 1.2、POM基础
 ##### 1.2.1、Simple POM(坐标)
@@ -31,7 +31,7 @@
 ##### 1.2.2、Super POM
 所有的 POM 都继承自一个父 POM（无论是否显式定义了这个父 POM）。父 POM 也被称作 Super POM，它包含了一些可以被继承的默认设置。
 
-effective pom:Super pom 加上工程自己的配置,命令：mvn help:effective-pom
+查看effective pom(Super pom 加上工程自己的配置)命令：mvn help:effective-pom
 
 ##### 1.2.3、Full POM
 ```xml
@@ -81,11 +81,12 @@ effective pom:Super pom 加上工程自己的配置,命令：mvn help:effective-
 
 #### 1.3、构建生命周期（Build Lifecycle）
 ##### 1.3.1、概念
-构建生命周期（Build Lifecycle）、阶段（Phase）、插件(Plugin)、目标（Goal）:
-构建生命周期由多个有序的构建阶段（sequence of phases）组成，一个构建阶段（Phase）可以绑定一个或者多个的目标。构建生命周期和阶段只是抽象的概念，不涉及具体的功能。 具体的功能由插件（Plugin）实现,一个插件可以实现多个目标（Goal）。而maven默认将某些目标自动绑定到某些阶段，只要进行了绑定，执行阶段时，自动就会执行该目标。
+概念：构建生命周期（Build Lifecycle）、阶段（Phase）、插件(Plugin)、目标（Goal）
 
-例如：
-mvn package
+解释：构建生命周期由多个有序的构建阶段（sequence of phases）组成，一个构建阶段（Phase）可以绑定一个或者多个的目标。构建生命周期和阶段只是抽象的概念，不涉及具体的功能。 具体的功能由插件（Plugin）实现,一个插件可以实现多个目标（Goal）。而maven默认将某些目标自动绑定到某些阶段，只要进行了绑定，执行阶段时，自动就会执行该目标。
+
+例如：mvn package
+
 这条命令执行的是default生命周期中的package阶段，而这个阶段默认绑定了maven-jar-plugin的jar目标（即jar:jar），所以执行这个阶段就会调用该插件jar目标所做的事情，也就是创建项目的jar包。当然也可以直接执行目标，比如：mvn dependency:copy-dependencies
 这里dependency是插件的名称，copy-denpendencies是插件的目标。
 如果需要将某个目标绑定到某个阶段，在POM文件中配置插件即可。
@@ -116,7 +117,7 @@ Maven Site 插件一般用来创建新的报告文档、部署站点等。
 
 #### 1.4、dependencies 
 ##### 1.4.1、仓库
-Maven 仓库有三种类型：
+Maven 仓库有以下几种类型：
 
 - 本地（local）
 - 中央（central）:http://search.maven.org/#browse
@@ -157,14 +158,14 @@ maven scope:
 ```
 
 ##### 1.4.4、快照（snapshot）
-快照是一个特殊的版本，它表示当前开发的一个副本。与常规版本不同，Maven 为每一次构建从远程仓库中检出一份新的快照版本。
-
 快照 vs 版本:
 对于版本，Maven 一旦下载了指定的版本（例如 data-service:1.0），它将不会尝试从仓库里再次下载一个新的 1.0 版本。想要下载新的代码，数据服务版本需要被升级到 1.1。
 
 对于快照，每次用户接口团队构建他们的项目时，Maven 将自动获取最新的快照（data-service:1.0-SNAPSHOT）。
 
 #### 1.5、maven插件
+everything is plugin
+
 Maven 实际上是一个依赖插件执行的框架，每个任务实际上是由插件完成：
 
 - 创建 jar 文件
@@ -177,7 +178,7 @@ Maven 实际上是一个依赖插件执行的框架，每个任务实际上是�
 插件通常提供了一个目标的集合，并且可以使用下面的语法执行：
 mvn [plugin-name]:[goal-name]
 
-使用的插件助手插件：maven-help-plugin
+实用的插件助手插件：maven-help-plugin
 
 #### 1.6、build配置
 ##### 1.6.1、Build Settings
@@ -192,7 +193,6 @@ mvn [plugin-name]:[goal-name]
     <!-- "Project Build" contains more elements than just the BaseBuild set -->  
     <build>...</build>  
   
-  
     <profiles>  
         <profile>  
             <!-- "Profile Build" contains a subset of "Project Build"s elements -->  
@@ -202,6 +202,7 @@ mvn [plugin-name]:[goal-name]
 </project>  
 ```
 1. The BaseBuild Element Set:
+
 ```xml
 <build>
   <defaultGoal>install</defaultGoal>
@@ -215,6 +216,7 @@ mvn [plugin-name]:[goal-name]
 ```
 
 2. Resources
+
 ```xml
  <build>
     ...
@@ -240,12 +242,34 @@ mvn [plugin-name]:[goal-name]
 
 3. Plugins和Plugin Management:
 pluginManagement的元素的配置和plugins的配置是一样的，只是这里的配置只是用于集成，在孩子POM中指定使用。
+```xml
+<build>
+    ...
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.6</version>
+        <extensions>false</extensions>
+        <inherited>true</inherited>
+        <configuration>
+          <classifier>test</classifier>
+        </configuration>
+        <dependencies>...</dependencies>
+        <executions>...</executions>
+      </plugin>
+    </plugins>
+	
+	<pluginManagement>
+	</pluginManagement>	
+  </build>
+```
 
 4. The Build Element Set:
 ```xml
  <build>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-    <scriptSourceDirectory>${basedir}/src/main/scripts</scriptSourceDirectory>
+    <scrirceDirptSouectory>${basedir}/src/main/scripts</scriptSourceDirectory>
     <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
     <outputDirectory>${basedir}/target/classes</outputDirectory>
     <testOutputDirectory>${basedir}/target/test-classes</testOutputDirectory>
@@ -253,11 +277,7 @@ pluginManagement的元素的配置和plugins的配置是一样的，只是这里
   </build>
 ```
 
-##### 1.6.2、构建自动化
-在 bus-core-api 的 pom 文件里添加一个编译目标来提醒 app-web-ui 工程和 app-desktop-ui 工程启动创建。
-使用一个持续集成（CI）的服务器，比如 Hudson，来实现自动化创建。
-
-##### 1.6.3、自动化部署
+##### 1.6.2、自动化部署
 一般情况下，在一个工程开发进程里，一次部署的过程包含需如下步骤：
 
 - 合入每个子工程下的代码到 SVN 或者源代码库，并标记它。
@@ -269,7 +289,9 @@ pluginManagement的元素的配置和plugins的配置是一样的，只是这里
 
 #### 1.7、maven聚合和继承
 我们使用Maven应用到实际项目的时候，需要将项目分成不同的模块。这个时候，Maven的聚合特性能够把项目的各个模块聚合在一起构件，而Maven的继承特性则能帮助抽取各模块相同的依赖和插件等配置。在简化POM的同时，还能促进各个模块配置的一致性。下面以具体项目来讲解:
+
 ![](../image/223534_0RUu_865771.png)
+
 user-parent的pom.xml详情如下:
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
