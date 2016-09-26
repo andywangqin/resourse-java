@@ -1,23 +1,42 @@
-### 1、maven
+### 1、maven安装和配置
 ---
-#### 1.1、maven安装和配置
-简单讲下maven的安装步骤：
-
+#### 1.1、maven的安装步骤
 1. 在安装maven之前，先确保已经安装JDK1.6及以上版本，并且配置好环境变量。
 2. 下载maven3，最新版本是Maven3.3.9 ，下载地址：[](http://maven.apache.org/download.html), 下载apache-maven-3.3.9-bin.zip文件后，并解压到D:\maven\apache-maven-3.3.9
 3. 配置maven3的环境变量：先配置M2_HOME的环境变量，新建一个系统变量：M2_HOME , 路径是：D:\cloud_cms\maven\apache-maven-3.3.9,再配置path环境变量，在path值的末尾添加"%M2_HOME%\bin"
 4. 点击确定之后，打开cmd窗口：输入 mvn -version,验证是否安装成功。
 
-给maven设置本地仓库:
+#### 1.2、配置文件settings.xml
+maven的配置文件为settings.xml，在下面路径中可以找到这个文件，分别为：
+- $M2_HOME/conf/settings.xml：全局设置，在maven的安装目录下
+- ${user.home}/.m2/settings.xml：用户设置，需要用户手动添加，可以将安装目录下的settings.xml文件拷贝过来修改
+```xml
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                        http://maven.apache.org/xsd/settings-1.0.0.xsd">
+        <localRepository/>
+        <interactiveMode/>
+        <usePluginRegistry/>
+        <offline/>
+        <pluginGroups/>
+        <servers/>
+        <mirrors/>
+        <proxies/>
+        <profiles/>
+        <activeProfiles/>
+    </settings>
+```
 
-1. 打开本地maven安装目录,比如我的本地存放目录是：D:\Util\maven\apache-maven-3.1.1
-2. 打开conf文件夹下的settings.xml文件，找到第53行，把注释去掉，修改成：
-<localRepository>D:/Util/maven/maven-dependcies</localRepository>
-当然了，前提是在这个路径下，手动建立了一个名为 maven-dependcies的文件夹，然后把本地仓库指向该路径。
-
-#### 1.2、POM基础
-##### 1.2.1、Simple POM(坐标)
-![](../image/QQ20160906113324.png)
+### 2、POM基础
+---
+#### 2.1、Simple POM(坐标)
+```xml
+<groupId>com.mycompany.app</groupId>  
+<artifactId>my-app</artifactId>  
+<packaging>jar</packaging>  
+<version>0.0.1-SNAPSHOT</version>  
+```
 
 |节点 |	描述 |
 | ------------- |:-------------:|
@@ -28,12 +47,13 @@
 |name	|项目的名称, Maven产生的文档用|
 |url	|项目主页的URL, Maven产生的文档用|
 
-##### 1.2.2、Super POM
+#### 2.2、Super POM
+位置：lib/maven-model-builder-3.x.x.jar:org/apache/maven/model/pom-4.0.0.xml.
 所有的 POM 都继承自一个父 POM（无论是否显式定义了这个父 POM）。父 POM 也被称作 Super POM，它包含了一些可以被继承的默认设置。
 
 查看effective pom(Super pom 加上工程自己的配置)命令：mvn help:effective-pom
 
-##### 1.2.3、Full POM
+#### 2.3、Full POM
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -79,9 +99,10 @@
 </project>
 ```
 
-#### 1.3、构建生命周期（Build Lifecycle）
-##### 1.3.1、概念
-概念：构建生命周期（Build Lifecycle）、阶段（Phase）、插件(Plugin)、目标（Goal）
+### 3、构建生命周期（Build Lifecycle）
+---
+#### 3.1、概念
+概念区分：构建生命周期（Build Lifecycle）、阶段（Phase）、插件(Plugin)、目标（Goal）
 
 解释：构建生命周期由多个有序的构建阶段（sequence of phases）组成，一个构建阶段（Phase）可以绑定一个或者多个的目标。构建生命周期和阶段只是抽象的概念，不涉及具体的功能。 具体的功能由插件（Plugin）实现,一个插件可以实现多个目标（Goal）。而maven默认将某些目标自动绑定到某些阶段，只要进行了绑定，执行阶段时，自动就会执行该目标。
 
@@ -97,12 +118,12 @@ Maven 有以下三个标准的构建生命周期:
 - default(or build)：定义了真正构建时所需要执行的所有步骤，它是生命周期中最核心的部分
 - site: 生成项目站点文档
 
-##### 1.3.2、Clean 生命周期
+#### 3.2、Clean 生命周期
 - pre-clean
 - clean
 - post-clean
 
-##### 1.3.3、Default (or Build) 生命周期
+#### 3.3、Default (or Build) 生命周期
 这是 Maven 的主要生命周期，被用于构建应用。
 
 |阶段	|处理	|描述|
@@ -112,11 +133,12 @@ Maven 有以下三个标准的构建生命周期:
 |package	|打包	|本阶段根据 pom.xml 中描述的打包配置创建 JAR / WAR 包|
 |install	|安装	|本阶段在本地 / 远程仓库中安装工程包|
 
-##### 1.3.4、Site 生命周期
+#### 3.4、Site 生命周期
 Maven Site 插件一般用来创建新的报告文档、部署站点等。
 
-#### 1.4、dependencies 
-##### 1.4.1、仓库
+### 4、dependencies 
+---
+#### 4.1、仓库
 Maven 仓库有以下几种类型：
 
 - 本地（local）
@@ -124,7 +146,7 @@ Maven 仓库有以下几种类型：
 - 远程（remote）
 - 私服
 
-##### 1.4.2、依赖管理
+#### 4.2、依赖管理
 通过传递依赖，所有被包含的库的图形可能会快速的增长。当重复的库存在时，可能出现的情形将会持续上升。Maven 提供一些功能来控制可传递的依赖的程度。
 
 |功能	|功能描述|
@@ -145,7 +167,7 @@ maven scope:
 |test测试阶段	|test范围依赖 在一般的编译和运行时都不需要，它们只有在测试编译和测试运行阶段可用。|
 |system系统阶段	|system范围依赖与provided 类似，但是你必须显式的提供一个对于本地系统中JAR 文件的路径。这么做是为了允许基于本地对象编译，而这些对象是系统类库的一部分。这样的构件应该是一直可用的，Maven 也不会在仓库中去寻找它。如果你将一个依赖范围设置成系统范围，你必须同时提供一个 systemPath 元素。注意该范围是不推荐使用的（你应该一直尽量去从公共或定制的 Maven 仓库中引用依赖）。|
 
-##### 1.4.3、外部依赖
+#### 4.3、外部依赖
 通常情况下它会包含一些任何仓库无法使用，并且 maven 也无法下载的 jar 文件。如果你的代码正在使用这个库，那么 Maven 的构建过程将会失败，因为在编译阶段它不能下载或者引用这个库。
 ```xml
  <dependency>
@@ -157,13 +179,14 @@ maven scope:
           </dependency>
 ```
 
-##### 1.4.4、快照（snapshot）
+#### 4.4、快照（snapshot）
 快照 vs 版本:
 对于版本，Maven 一旦下载了指定的版本（例如 data-service:1.0），它将不会尝试从仓库里再次下载一个新的 1.0 版本。想要下载新的代码，数据服务版本需要被升级到 1.1。
 
 对于快照，每次用户接口团队构建他们的项目时，Maven 将自动获取最新的快照（data-service:1.0-SNAPSHOT）。
 
-#### 1.5、maven插件
+### 5、maven插件
+---
 everything is plugin
 
 Maven 实际上是一个依赖插件执行的框架，每个任务实际上是由插件完成：
@@ -180,8 +203,9 @@ mvn [plugin-name]:[goal-name]
 
 实用的插件助手插件：maven-help-plugin
 
-#### 1.6、build配置
-##### 1.6.1、Build Settings
+### 6、build配置
+---
+#### 6.1、Build Settings
 根据POM 4.0.0 XSD，build元素概念性的划分为两个部分：BaseBuild（包含poject build和profile build的公共部分，见下）和poject build包含的一些高级特性。
 
 ```xml
@@ -275,7 +299,7 @@ pluginManagement的元素的配置和plugins的配置是一样的，只是这里
   </build>
 ```
 
-##### 1.6.2、自动化部署
+#### 6.2、自动化部署
 一般情况下，在一个工程开发进程里，一次部署的过程包含需如下步骤：
 
 - 合入每个子工程下的代码到 SVN 或者源代码库，并标记它。
@@ -285,7 +309,8 @@ pluginManagement的元素的配置和plugins的配置是一样的，只是这里
 - 从网络上获得该文件并且部署该文件到产品线上。
 - 更新文档日期和应用程序的版本号。
 
-#### 1.7、maven聚合和继承
+### 7、maven聚合和继承
+---
 我们使用Maven应用到实际项目的时候，需要将项目分成不同的模块。这个时候，Maven的聚合特性能够把项目的各个模块聚合在一起构件，而Maven的继承特性则能帮助抽取各模块相同的依赖和插件等配置。在简化POM的同时，还能促进各个模块配置的一致性。下面以具体项目来讲解:
 
 ![](../image/223534_0RUu_865771.png)
@@ -356,7 +381,8 @@ user-parent的pom.xml详情如下:
 </project>
 ```
 
-#### 1.8、profile
+### 1.8、profile
+---
 构建配置文件是一组配置的集合，用来设置或者覆盖 Maven 构建的默认配置,使用构建配置文件，可以为不同的环境定制构建过程，例如 Producation 和 Development 环境，在profile里几乎可以定义所有在pom里的定义的内容（<dependencies>，<properties>，插件配置等等，不过不能再定义他自己了）。当一个profile被激活时，它定义的<dependencies>，<properties>等就会覆盖掉原pom里定义的相同内容，从而可以通过激活不同的profile来使用不同的配置。
 ```xml
 <profiles>
@@ -396,18 +422,21 @@ Profile 激活，Maven 的 Profile 能够通过几种不同的方式激活。
 - 操作系统配置（例如，Windows family）
 - 现存 / 缺失 文件
 
-#### 1.9、demo
-##### 1.9.1、create project
+### 9、demo
+#### 9.1、create project
 Maven 使用原型（archetype）插件创建web工程，执行:
 
 mvn archetype:generate -DgroupId=com.qianmo.demo -DartifactId=demo-server -Dversion=1.0.0-SNAPSHOT -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
 
-##### 1.9.2、import maven project
+#### 9.2、import maven project
 
 1. 通过idea new菜单，import maven项目
 2. idea 设置
 Import Maven projects automatically; add java package
 3. 集成tomcat
+
+
+
 
 参考:
 
