@@ -28,7 +28,7 @@ maven的配置文件为settings.xml，在下面路径中可以找到这个文件
     </settings>
 ```
 
-### 2、POM基础
+### 2、POM介绍
 ---
 #### 2.1、Simple POM(坐标)
 ```xml
@@ -48,8 +48,7 @@ maven的配置文件为settings.xml，在下面路径中可以找到这个文件
 |url	|项目主页的URL, Maven产生的文档用|
 
 #### 2.2、Super POM
-位置：lib/maven-model-builder-3.x.x.jar:org/apache/maven/model/pom-4.0.0.xml.
-所有的 POM 都继承自一个父 POM（无论是否显式定义了这个父 POM）。父 POM 也被称作 Super POM，它包含了一些可以被继承的默认设置。
+所有的 POM 都继承自一个父 POM，无论是否显式定义了这个父 POM，默认继承lib/maven-model-builder-3.x.x.jar:org/apache/maven/model/pom-4.0.0.xml。父 POM 也被称作Super POM，它包含了一些可以被继承的默认设置。
 
 查看effective pom(Super pom 加上工程自己的配置)命令：mvn help:effective-pom
 
@@ -144,20 +143,20 @@ Maven 仓库有以下几种类型：
 - 本地（local）
 - 中央（central）:http://search.maven.org/#browse
 - 远程（remote）
-- 私服
+- 私服 
 
 #### 4.2、依赖管理
-通过传递依赖，所有被包含的库的图形可能会快速的增长。当重复的库存在时，可能出现的情形将会持续上升。Maven 提供一些功能来控制可传递的依赖的程度。
+通过传递依赖，所有被包含的库的图形可能会快速的增长。当重复的库存在时，可能出现的情形将会持续上升。Maven 提供一些功能来控制可传递的依赖的程度:
 
 |功能	|功能描述|
 | ------------- |:-------------:|
-|依赖调节	|决定当多个手动创建的版本同时出现时，哪个依赖版本将会被使用。 如果两个依赖版本在依赖树里的深度是一样的时候，第一个被声明的依赖将会被使用。|
-|依赖管理	|直接的指定手动创建的某个版本被使用。例如当一个工程 C 在自己的以来管理模块包含工程 B，即 B 依赖于 A， 那么A 即可指定在 B 被引用时所使用的版本。|
-|依赖范围	|包含在构建过程每个阶段的依赖。|
-|依赖排除	|任何可传递的依赖都可以通过 "exclusion" 元素被排除在外。举例说明，A 依赖 B， B 依赖 C，因此 A 可以标记 C 为 “被排除的”。|
-|依赖可选	|任何可传递的依赖可以被标记为可选的，通过使用 "optional" 元素。例如：A 依赖 B， B 依赖 C。因此，B 可以标记 C 为可选的， 这样 A 就可以不再使用 C。|
+|依赖调解	|当项目中出现多个版本构件依赖的情形，依赖调解决定最终应该使用哪个版本。目前，Maven 2.0只支持“短路径优先”原则，意思是项目会选择依赖关系树中路径最短的版本作为依赖。当然，你也可以在项目POM文件中显式指定使用哪个版本。值得注意的是，在Maven2.0.8及之前的版本中，当两个版本的依赖路径长度一致时，哪个依赖会被使用是不确定的。不过从Maven 2.0.9开始，POM中依赖声明的顺序决定了哪个版本会被使用，也叫作”第一声明原则”。|
+|依赖管理	|在出现传递性依赖或者没有指定版本时，项目作者可以通过依赖管理直接指定模块版本。之前的章节说过，由于传递性依赖，尽管某个依赖没有被A直接指定，但也会被引入。相反的，A也可以将D加入```<dependencyManagement>```元素中，并在D可能被引用时决定D的版本号。|
+|依赖范围	|你可以指定只在当前编译范围内包含合适的依赖。 下面会介绍更多相关的细节。|
+|排除依赖	|任何可传递的依赖都可以通过 "exclusion" 元素被排除在外。举例说明，A 依赖 B， B 依赖 C，因此 A 可以标记 C 为 “被排除的”。|
+|可选依赖	|如果项目Y依赖项目Z，项目Y的所有者可以使用”optional”元素来指定项目Z作为X的可选依赖。那么当项目X依赖项目Y时，X只依赖Y并不依赖Y的可选依赖Z。项目X的所有者也可以根据自己的意愿显式指定X对Z的依赖。（你可以把可选依赖理解为默认排除）。|
 
-maven scope:
+*dependency scope*:
 
 |范围	|描述|
 | ------------- |:-------------:|
@@ -181,16 +180,14 @@ maven scope:
 
 #### 4.4、快照（snapshot）
 快照 vs 版本:
-对于版本，Maven 一旦下载了指定的版本（例如 data-service:1.0），它将不会尝试从仓库里再次下载一个新的 1.0 版本。想要下载新的代码，数据服务版本需要被升级到 1.1。
-
-对于快照，每次用户接口团队构建他们的项目时，Maven 将自动获取最新的快照（data-service:1.0-SNAPSHOT）。
+- 对于版本，Maven 一旦下载了指定的版本（例如 data-service:1.0），它将不会尝试从仓库里再次下载一个新的 1.0 版本。想要下载新的代码，数据服务版本需要被升级到 1.1。
+- 对于快照，每次用户接口团队构建他们的项目时，Maven 将自动获取最新的快照（data-service:1.0-SNAPSHOT）。
 
 ### 5、maven插件
 ---
-everything is plugin
+*everything is plugin*
 
 Maven 实际上是一个依赖插件执行的框架，每个任务实际上是由插件完成：
-
 - 创建 jar 文件
 - 创建 war 文件
 - 编译代码文件
@@ -198,10 +195,50 @@ Maven 实际上是一个依赖插件执行的框架，每个任务实际上是�
 - 创建工程文档
 - 创建工程报告
 
-插件通常提供了一个目标的集合，并且可以使用下面的语法执行：
-mvn [plugin-name]:[goal-name]
+插件通常提供了一个目标的集合，并且可以使用下面的语法执行：mvn [plugin-name]:[goal-name]
 
-实用的插件助手插件：maven-help-plugin
+### 5.1、插件助手插件maven-help-plugin
+Maven help 这个插件就是用来查询具体插件相关信息的，maven help 插件2.2版本有9个goals，下面重点说下describe这个goal 的用法：
+*help:describe*
+描述插件的属性。它不需要在项目目录下运行。但是你必须提供你想要描述插件的前缀或者 groupId和artifactId。通过 plugin 参数你可以指定你想要了解哪个插件，你可以传入插件的前缀（如 maven-war-plugin 插件的前缀就是war），或者可以是 groupId:artifact[:version] ，这里 version 是可选的
+
+举例说明如下（以maven-war-plugin 为例 ）
+ mvn help:describe -Dplugin=war
+ 或者
+ mvn help:describe -Dplugin=org.apache.maven.plugins:maven-war-plugin
+ 或者
+ mvn help:describe -DgroupId=org.apache.maven.plugins -DartifactId=maven-war-plugin
+ 
+如果想了解详细信息，可以在其后加上-Ddetail 或者 -Dfull,如：mvn help:describe -Dplugin=org.apache.maven.plugins:maven-war-plugin -Ddetail
+
+#### 5.2、打包插件assembly
+使用Maven对Web项目进行打包，默认为war包；但有些时候，总是希望打成zip包(亦或其他压缩包)，maven-war-plugin插件就无能为力了，这时就用到了maven-assembly-plugin插件了，该插件能打包成指定格式分发包，更重要的是能够自定义包含/排除指定的目录或文件（遗留项目中,过滤配置文件时,或者仅仅需要发布图片或者CSS/JS等指定类型文件时,发挥作用)
+该插件使用如下:
+```xml
+<build>
+  <plugins>
+    <plugin>
+      <artifactId>maven-assembly-plugin</artifactId> <!-- 官网给出的配置，没有配置 groupId，这里也不配置 -->
+      <version>2.4</version>
+      <executions>
+        <execution>
+          <id>make-assembly</id> <!-- ID 标识，命名随意 -->
+          <phase>package</phase> <!-- 绑定到 PACKAGE 生命周期阶段 -->
+          <goals>
+            <goal>single</goal>  <!-- 在 PACKAGE 生命周期阶段仅执行一次 -->
+          </goals>
+        </execution>
+      </executions>
+      <configuration>
+        <descriptors>
+          <descriptor>assembly.xml</descriptor> <!-- 自定义打包的配置文件 -->
+        </descriptors>
+        <appendAssemblyId>false</appendAssemblyId> <!-- 设为 FALSE, 防止 WAR 包名加入 assembly.xml 中的 ID -->
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+```
 
 ### 6、build配置
 ---
@@ -262,8 +299,7 @@ mvn [plugin-name]:[goal-name]
   </build>
 ```
 
-- Plugins和Plugin Management:
-pluginManagement的元素的配置和plugins的配置是一样的，只是这里的配置只是用于集成，在孩子POM中指定使用。
+- Plugins和Plugin Management，pluginManagement的元素的配置和plugins的配置是一样的，只是这里的配置只是用于集成，在孩子POM中指定使用。
 ```xml
 <build>
     ...
@@ -281,7 +317,6 @@ pluginManagement的元素的配置和plugins的配置是一样的，只是这里
         <executions>...</executions>
       </plugin>
     </plugins>
-	
 	<pluginManagement>
 	</pluginManagement>	
   </build>
@@ -291,7 +326,7 @@ pluginManagement的元素的配置和plugins的配置是一样的，只是这里
 ```xml
  <build>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-    <scrirceDirptSouectory>${basedir}/src/main/scripts</scriptSourceDirectory>
+    <scriptSourceDirectory>${basedir}/src/main/scripts</scriptSourceDirectory>
     <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
     <outputDirectory>${basedir}/target/classes</outputDirectory>
     <testOutputDirectory>${basedir}/target/test-classes</testOutputDirectory>
@@ -381,9 +416,10 @@ user-parent的pom.xml详情如下:
 </project>
 ```
 
-### 1.8、profile
+### 8、profile
 ---
-构建配置文件是一组配置的集合，用来设置或者覆盖 Maven 构建的默认配置,使用构建配置文件，可以为不同的环境定制构建过程，例如 Producation 和 Development 环境，在profile里几乎可以定义所有在pom里的定义的内容（<dependencies>，<properties>，插件配置等等，不过不能再定义他自己了）。当一个profile被激活时，它定义的<dependencies>，<properties>等就会覆盖掉原pom里定义的相同内容，从而可以通过激活不同的profile来使用不同的配置。
+#### 8.1、构建配置文件
+构建配置文件是一组配置的集合，用来设置或者覆盖Maven构建的默认配置,使用构建配置文件，可以为不同的环境定制构建过程，例如 Producation 和 Development 环境，在profile里几乎可以定义所有在pom里的定义的内容（<dependencies>，<properties>，插件配置等等，不过不能再定义他自己了）。当一个profile被激活时，它定义的<dependencies>，<properties>等就会覆盖掉原pom里定义的相同内容，从而可以通过激活不同的profile来使用不同的配置。
 ```xml
 <profiles>
       <profile>
@@ -415,28 +451,25 @@ user-parent的pom.xml详情如下:
       </profile>
    </profiles>
 ```
-Profile 激活，Maven 的 Profile 能够通过几种不同的方式激活。
-- 显式使用命令控制台输入
+*Profile 激活，Maven 的 Profile 能够通过几种不同的方式激活:*
+- 显式使用命令控制台输入,mvn install -Pproduction
 - 通过 maven 设置
 - 基于环境变量（用户 / 系统变量）
 - 操作系统配置（例如，Windows family）
 - 现存 / 缺失 文件
 
 ### 9、demo
+---
 #### 9.1、create project
 Maven 使用原型（archetype）插件创建web工程，执行:
 
 mvn archetype:generate -DgroupId=com.qianmo.demo -DartifactId=demo-server -Dversion=1.0.0-SNAPSHOT -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
 
 #### 9.2、import maven project
-
 1. 通过idea new菜单，import maven项目
 2. idea 设置
 Import Maven projects automatically; add java package
 3. 集成tomcat
-
-
-
 
 参考:
 
