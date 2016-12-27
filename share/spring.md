@@ -1,12 +1,11 @@
-### 1、spring
+#### 1、spring体系结构
 ---
-#### 1.1、spring体系结构
 - 依赖注入（DI）: 控制反转（IoC）是一个通用的概念，它可以用许多不同的方式去表达，依赖注入仅仅是控制反转的一个具体的例子。
 - 面向切面的程序设计（AOP）
 
 ![](../image/arch1.png)
 
-#### 1.2、IoC 容器
+#### 2、IoC 容器
 Spring 容器是 Spring 框架的核心。容器将创建对象，把它们连接在一起，配置它们，并管理他们的整个生命周期从创建到销毁。Spring 提供了以下两种不同类型的容器：
 
 |序号	|容器 | 描述|
@@ -16,8 +15,8 @@ Spring 容器是 Spring 框架的核心。容器将创建对象，把它们连�
 
 ApplicationContext 包含 BeanFactory 所有的功能，一般情况下，相对于 BeanFactory，ApplicationContext 会被推荐使用。BeanFactory 仍然可以在轻量级应用中使用，比如移动设备或者基于 applet 的应用程序。
 
-#### 1.3、Bean
-##### 1.3.1、Bean 定义
+#### 3、Bean
+##### 3.1、Bean 定义
 bean 是一个被实例化，组装，并通过 Spring IoC 容器所管理的对象
 
 |属性	|描述|
@@ -32,7 +31,7 @@ bean 是一个被实例化，组装，并通过 Spring IoC 容器所管理的对
 |initialization 方法	|在 bean 的所有必需的属性被容器设置之后，调用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
 |destruction 方法	|当包含该 bean 的容器被销毁时，使用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
 
-##### 1.3.2、Bean 的作用域
+##### 3.2、Bean 的作用域
 
 | 作用域| 	描述| 
 | ------------- |:-------------:|
@@ -44,15 +43,16 @@ bean 是一个被实例化，组装，并通过 Spring IoC 容器所管理的对
 
 一般说来，满状态的 bean 使用 prototype 作用域和没有状态的 bean 使用 singleton 作用域。
 
-##### 1.3.3、Bean 的生命周期
+##### 3.3、Bean 的生命周期
 本章将只讨论两个重要的生命周期回调方法，它们在 bean 的初始化和销毁的时候是必需的。
 为了定义安装和拆卸一个 bean，我们只要声明带有 init-method 和/或 destroy-method 参数的 。init-method 属性指定一个方法，在实例化 bean 时，立即调用该方法。同样，destroy-method 指定一个方法，只有从容器中移除 bean 之后，才能调用该方法。
 
-##### 1.3.4、Bean 后置处理器
+##### 3.4、Bean 后置处理器
 BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供自己的实例化逻辑，依赖解析逻辑等。你也可以在 Spring 容器通过插入一个或多个 BeanPostProcessor 的实现来完成实例化，配置和初始化一个bean之后实现一些自定义逻辑回调方法。
 
-#### 1.4、依赖注入
-##### 1.4.1、xml装配
+#### 4、依赖注入
+---
+##### 4.1、xml装配
 |序号	|依赖注入类型 & 描述|
 | ------------- |:-------------:|
 |1	Constructor-based dependency injection|当容器调用带有多个参数的构造函数类时，实现基于构造函数的 DI，每个代表在其他类中的一个依赖关系。|
@@ -78,7 +78,7 @@ BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供�
 |<map>	|它可以用来注入名称-值对的集合，其中名称和值可以是任何类型。|
 |<props>	|它可以用来注入名称-值对的集合，其中名称和值都是字符串类型。|
 
-##### 1.4.2、Beans 自动装配
+##### 4.2、Beans自动装配
 
 |模式	|描述|
 | ------------- |:-------------:|
@@ -88,16 +88,42 @@ BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供�
 |constructor	|类似于 byType，但该类型适用于构造函数参数类型。如果在容器中没有一个构造函数参数类型的 bean，则一个致命错误将会发生。|
 |autodetect|	Spring首先尝试通过 constructor 使用自动装配来连接，如果它不执行，Spring 尝试通过 byType 来自动装配。|
 
-##### 1.4.3、基于注解的配置
+byName例子：
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <!-- Definition for textEditor bean -->
+   <bean id="textEditor" class="com.tutorialspoint.TextEditor" 
+      autowire="byName">
+      <property name="name" value="Generic Text Editor" />
+   </bean>
+
+   <!-- Definition for spellChecker bean -->
+   <bean id="spellChecker" class="com.tutorialspoint.SpellChecker">
+   </bean>
+
+</beans>
+```
+##### 4.3、基于注解的装配
+所以如果你想在 Spring 应用程序中使用的任何注解，可以考虑到下面的配置文件:
+```xml
+	<context:annotation-config/>
+   <!-- bean definitions go here -->
+```
 
 |序号	|注解 & 描述|
 | ------------- |:-------------:|
 |1	|@Required,@Required 注解应用于 bean 属性的 setter 方法。|
 |2	|@Autowired,@Autowired 注解可以应用到 bean 属性的 setter 方法，非 setter 方法，构造函数和属性。|
-|3	|@Qualifier,通过指定确切的将被连线的 bean，@Autowired 和 @Qualifier 注解可以用来删除混乱。|
+|3	|@Qualifier,通过指定确切的将被连线的bean，@Autowired 和@Qualifier注解可以用来删除混乱。|
 |4	|JSR-250 Annotations,Spring 支持 JSR-250 的基础的注解，其中包括了 @Resource，@PostConstruct 和 @PreDestroy 注解。|
 
-##### 1.4.4、Spring组件扫描
+##### 4.4、注解申明bean
+- Spring组件扫描
+
 ```xml
 <context:component-scan base-package="com.xhlx.finance.budget" > 
      <context:include-filter type="regex" expression=".service.*"/> 
@@ -105,11 +131,13 @@ BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供�
 ```
 @Component是所有受Spring管理组件的通用形式；而@Repository、@Service和 @Controller则是@Component的细化，用来表示更具体的用例(例如，分别对应了持久化层、服务层和表现层)。也就是说，你能用@Component来注解你的组件类，但如果用@Repository、@Service 或@Controller来注解它们，你的类也许能更好地被工具处理，或与切面进行关联。
 
-##### 1.4.5、基于 Java 的配置
-@Configuration 和 @Bean 注解
-带有 @Configuration 的注解类表示这个类可以使用 Spring IoC 容器作为 bean 定义的来源。@Bean 注解告诉 Spring，一个带有 @Bean 的注解方法将返回一个对象，该对象应该被注册为在 Spring 应用程序上下文中的 bean。
+- 基于 Java 的配置
 
-#### 1.5、Spring 中的事件处理
+@Configuration 和 @Bean 注解
+带有 @Configuration 的注解类表示这个类可以使用 Spring IoC 容器作为 bean 定义的来源。@Bean注解告诉 Spring，一个带有 @Bean 的注解方法将返回一个对象，该对象应该被注册为在 Spring 应用程序上下文中的 bean。
+
+#### 5、Spring 中的事件处理
+---
 Spring 提供了以下的标准事件：
 
 |序号|	Spring 内置事件 & 描述|
@@ -124,7 +152,7 @@ Spring 提供了以下的标准事件：
 
 Spring 中可自定义事件：扩展ApplicationEvent和ApplicationListener
 
-#### 1.6、AOP
+#### 6、AOP
 Spring AOP 模块提供拦截器来拦截一个应用程序，例如，当执行一个方法时，你可以在方法执行之前或之后添加额外的功能。AOP 术语:
 
 |项	|描述|
@@ -147,7 +175,7 @@ Spring 切面可以使用下面提到的五种通知工作：
 |抛出异常后通知	|在一个方法执行之后，只有在方法退出抛出异常时，才能执行通知。|
 |环绕通知	|在建议方法调用之前和之后，执行通知。|
 
-##### 1.6.1、XML Schema based
+##### 6.1、XML Schema based
 基于 AOP 的 XML 架构的示例:
 - 1.这里是 Logging.java 文件的内容。这实际上是 aspect 模块的一个示例，它定义了在各个点调用的方法。
 ```
@@ -263,10 +291,10 @@ public class MainApp {
 </beans>
 ```
 
-##### 1.6.2、@AspectJ based
+##### 6.2、@AspectJ based
 
-#### 1.7、ORM
-##### 1.7.1、Spring事务管理
+#### 7、ORM
+##### 7.1、Spring事务管理
 1.Spring 支持两种类型的事务管理:
 
 - 编程式事务管理 ：这意味着你在编程的帮助下有管理事务。这给了你极大的灵活性，但却很难维护。
@@ -303,7 +331,7 @@ public interface TransactionDefinition {
 }
 ```
 
-#### 1.8、Spring中的Profile
+#### 8、Spring中的Profile
 由于我们平时在开发中，通常会出现在开发的时候使用一个开发数据库，测试的时候使用一个测试的数据库，而实际部署的时候需要一个数据库。以前的做法是将这些信息写在一个配置文件中，当我把代码部署到测试的环境中，将配置文件改成测试环境；当测试完成，项目需要部署到现网了，又要将配置信息改成现网的，真的好烦。。。而使用了Profile之后，我们就可以分别定义3个配置文件，一个用于开发、一个用户测试、一个用户生产，其分别对应于3个Profile。当在实际运行的时候，只需给定一个参数来激活对应的Profile即可，那么容器就会只加载激活后的配置文件，这样就可以大大省去我们修改配置信息而带来的烦恼。
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -348,8 +376,8 @@ public interface TransactionDefinition {
 </context-param>
 ```
 
-#### 1.9、Spring mvc
-##### 1.9.1、DispatcherServlet
+#### 9、Spring mvc
+##### 9.1、DispatcherServlet
 ![](../image/mvc1.png)
 
 下面是对应于 DispatcherServlet 传入 HTTP 请求的事件序列：

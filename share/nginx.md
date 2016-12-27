@@ -1,19 +1,19 @@
 ###1、简介
 ---
 ####1.1、概述
-Nginx ("engine x") 是一个高性能的 HTTP 和 反向代理 服务器，也是一个 IMAP/POP3/SMTP 代理服务器 。 Nginx 是由 Igor Sysoev 为俄罗斯访问量第二的Rambler.ru 站点开发的，它已经在该站点运行超过四年多了。Igor 将源代码以类BSD许可证的形式发布。自Nginx 发布四年来，Nginx 已经因为它的稳定性、丰富的功能集、 示例配置文件和低系统资源的消耗而闻名了。目前国内各大门户网站已经部署了Nginx，如新浪、网易、腾讯等；国内几个重要的视频分享网站也部署了Nginx，如六房间、酷6等。 新近发现Nginx 技术在国内日趋火热，越来越多的网站开始部署Nginx。
+Nginx("engine x")是一个高性能的HTTP和反向代理服务器(代理服务器和server位于同一网段)，也是一个 IMAP/POP3/SMTP 代理服务器 。Nginx是由Igor Sysoev为俄罗斯访问量第二的Rambler.ru站点开发的，它已经在该站点运行超过四年多了。Igor将源代码以类BSD许可证的形式发布。自Nginx 发布四年来，Nginx 已经因为它的稳定性、丰富的功能集、示例配置文件和低系统资源的消耗而闻名了。目前国内各大门户网站已经部署了Nginx，如新浪、网易、腾讯等；国内几个重要的视频分享网站也部署了Nginx，如六房间、酷6等。 新近发现Nginx 技术在国内日趋火热，越来越多的网站开始部署Nginx。
 
 ####1.2、优点
 Nginx 是一个很牛的高性能Web和反向代理服务器, 它具有有很多非常优越的特性:
 
-- 在高连接并发的情况下，Nginx是Apache服务器不错的替代品: Nginx在美国是做虚拟主机生意的老板们经常选择的软件平台之一. 能够支持高达 50,000 个并发连接数的响应, 感谢Nginx为我们选择了 epoll and kqueue 作为开发模型.
-- Nginx作为负载均衡服务器: Nginx 既可以在内部直接支持 Rails 和 PHP 程序对外进行服务, 也可以支持作为 HTTP代理 服务器对外进行服务. Nginx采用C进行编写, 不论是系统资源开销还是CPU使用效率都比 Perlbal 要好很多.
+- 在高连接并发的情况下，Nginx是Apache服务器不错的替代品: Nginx在美国是做虚拟主机生意的老板们经常选择的软件平台之一. 能够支持高达50,000 个并发连接数的响应, 感谢Nginx为我们选择了 epoll and kqueue 作为开发模型.
+- Nginx作为负载均衡服务器: Nginx 既可以在内部直接支持 Rails 和 PHP 程序对外进行服务, 也可以支持作为HTTP代理 服务器对外进行服务. Nginx采用C进行编写, 不论是系统资源开销还是CPU使用效率都比 Perlbal 要好很多.
 - 作为邮件代理服务器: Nginx 同时也是一个非常优秀的邮件代理服务器（最早开发这个产品的目的之一也是作为邮件代理服务器）, Last.fm 描述了成功并且美妙的使用经验.
-- Nginx 是一个 [#installation 安装] 非常的简单 , 配置文件 非常简洁（还能够支持perl语法）, Bugs 非常少的服务器: Nginx 启动特别容易, 并且几乎可以做到7*24不间断运行，即使运行数个月也不需要重新启动. 你还能够 不间断服务的情况下进行软件版本的升级 .
+- Nginx 是一个 [#installation 安装] 非常的简单 , 配置文件非常简洁（还能够支持perl语法）, Bugs 非常少的服务器: Nginx 启动特别容易, 并且几乎可以做到7*24不间断运行，即使运行数个月也不需要重新启动. 你还能够不间断服务的情况下进行软件版本的升级 .
 
 ####1.3、安装Nginx
 
-####1.4、运行和控制 Nginx
+####1.4、运行Nginx
 选项
 -c </path/to/config> 为 Nginx 指定一个配置文件，来代替缺省的。
 -t 不运行，而仅仅测试配置文件。nginx 将检查配置文件的语法的正确性，并尝试打开配置文件中所引用到的文件。
@@ -25,8 +25,10 @@ Nginx 是一个很牛的高性能Web和反向代理服务器, 它具有有很多
 /usr/bin/nginx -t -c ~/mynginx.conf
 ```
 
-####1.5、通过系统的信号控制 Nginx
-*主进程*可以处理以下的信号：
+####1.5、通过系统的信号控制Nginx
+*信号（英语：Signals）*是Unix、类Unix以及其他POSIX兼容的操作系统中进程间通讯的一种有限制的方式。它是一种异步的通知机制，用来提醒进程一个事件已经发生。当一个信号发送给一个进程，操作系统中断了进程正常的控制流程，此时，任何非原子操作都将被中断。如果进程定义了信号的处理函数，那么它将被执行，否则就执行默认的处理函数。
+
+主进程可以处理以下的信号：
 
 |TERM, INT|	快速关闭|
 |--:|--:|
@@ -43,8 +45,8 @@ Nginx 是一个很牛的高性能Web和反向代理服务器, 它具有有很多
 |QUIT	|从容关闭|
 |USR1	|重新打开日志文件|
 
-* 使用信号加载新的配置
-* 平滑升级到新的二进制代码
+- 使用信号加载新的配置
+- 升级nginx
 
 ####1.6、事件模型
 1. hash表
@@ -67,14 +69,58 @@ Nginx支持如下处理连接的方法（I/O复用方法），这些方法可以
 - /dev/poll - 高效的方法，使用于 Solaris 7 11/99+, HP/UX 11.22+ (eventport), IRIX 6.5.15+ 和 Tru64 UNIX 5.1A+.
 - eventport - 高效的方法，使用于 Solaris 10. 为了防止出现内核崩溃的问题， 有必要安装 这个 安全补丁。
 
+####1.7、调试 nginx
+Nginx的一个 杀手级特性 就是你能使用 debug_connection 指令只调试 某些 连接。
+
+这个设置只有是你使用 --with-debug 编译的nginx才有效。
+
+在 这里 你能看到所有可能的调试选项。
+
 ###2、主模块
----
+[#daemon daemon]
+[#debug_points debug_points]
+[#error_log error_log]
+[#include include]
+[#lock_file lock_file]
+[#master_process master_process]
+[#pid pid]
+[#ssl_engine ssl_engine]
+[#timer_resolution timer_resolution]
+[#user user group]
+[#worker_cpu_affinity worker_cpu_affinity]
+[#worker_priority worker_priority]
+[#worker_processes worker_processes]
+[#worker_rlimit_core worker_rlimit_core]
+[#worker_rlimit_nofile worker_rlimit_nofile]
+[#worker_rlimit_sigpending worker_rlimit_sigpending]
+[#working_directory working_directory]
 
 ###3、事件模块
----
+accept_mutex
+accept_mutex_delay
+debug_connection
+devpoll_changes
+devpoll_events
+kqueue_changes
+kqueue_events
+epoll_events
+multi_accept
+rtsig_signo
+rtsig_overflow_events
+rtsig_overflow_test
+rtsig_overflow_threshold
 
 ###4、HTTP模块
----
+
+###5、第三方模块
+
+
+###9、案例
+
+
+
+
+
 
 参考：
 

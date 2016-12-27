@@ -2,14 +2,16 @@
 ---
 #### 1.1、maven的安装步骤
 1. 在安装maven之前，先确保已经安装JDK1.6及以上版本，并且配置好环境变量。
-2. 下载maven3，最新版本是Maven3.3.9 ，下载地址：[](http://maven.apache.org/download.html), 下载apache-maven-3.3.9-bin.zip文件后，并解压到D:\maven\apache-maven-3.3.9
-3. 配置maven3的环境变量：先配置M2_HOME的环境变量，新建一个系统变量：M2_HOME , 路径是：D:\cloud_cms\maven\apache-maven-3.3.9,再配置path环境变量，在path值的末尾添加"%M2_HOME%\bin"
+2. 下载maven3，最新版本是Maven3.3.9 ，下载地址：[http://maven.apache.org/download.html](http://maven.apache.org/download.html), 下载apache-maven-3.3.9-bin.zip文件后，并解压到D:\maven\apache-maven-3.3.9
+3. 配置maven3的环境变量：先配置M2_HOME的环境变量，新建一个系统变量：M2_HOME , 路径是：D:\maven\apache-maven-3.3.9,再配置path环境变量，在path值的末尾添加"%M2_HOME%\bin"
 4. 点击确定之后，打开cmd窗口：输入 mvn -version,验证是否安装成功。
 
 #### 1.2、配置文件settings.xml
 maven的配置文件为settings.xml，在下面路径中可以找到这个文件，分别为：
+
 - $M2_HOME/conf/settings.xml：全局设置，在maven的安装目录下
 - ${user.home}/.m2/settings.xml：用户设置，需要用户手动添加，可以将安装目录下的settings.xml文件拷贝过来修改
+
 ```xml
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -36,6 +38,10 @@ maven的配置文件为settings.xml，在下面路径中可以找到这个文件
 <artifactId>my-app</artifactId>  
 <packaging>jar</packaging>  
 <version>0.0.1-SNAPSHOT</version>  
+
+<name>app for ios</name> 
+<url>http://</url> 
+<classifier>jdk15</classifier> 
 ```
 
 |节点 |	描述 |
@@ -46,6 +52,7 @@ maven的配置文件为settings.xml，在下面路径中可以找到这个文件
 |packaging	|项目产生的构件类型，例如jar、war、ear、pom。插件可以创建他们自己的构件类型，所以前面列的不是全部构件类型|
 |name	|项目的名称, Maven产生的文档用|
 |url	|项目主页的URL, Maven产生的文档用|
+|classifier	|它表示在相同版本下针对不同的环境或者jdk使用的jar|
 
 #### 2.2、Super POM
 所有的 POM 都继承自一个父 POM，无论是否显式定义了这个父 POM，默认继承lib/maven-model-builder-3.x.x.jar:org/apache/maven/model/pom-4.0.0.xml。父 POM 也被称作Super POM，它包含了一些可以被继承的默认设置。
@@ -55,7 +62,7 @@ maven的配置文件为settings.xml，在下面路径中可以找到这个文件
 #### 2.3、Full POM
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instCentral Repositoryance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -141,7 +148,7 @@ Maven Site 插件一般用来创建新的报告文档、部署站点等。
 Maven 仓库有以下几种类型：
 
 - 本地（local）
-- 中央（central）:http://search.maven.org/#browse
+- 中央（central）:http://search.maven.org/#browse --> https://repo.maven.apache.org/maven2
 - 远程（remote）
 - 私服 
 
@@ -182,6 +189,18 @@ Maven 仓库有以下几种类型：
 快照 vs 版本:
 - 对于版本，Maven 一旦下载了指定的版本（例如 data-service:1.0），它将不会尝试从仓库里再次下载一个新的 1.0 版本。想要下载新的代码，数据服务版本需要被升级到 1.1。
 - 对于快照，每次用户接口团队构建他们的项目时，Maven 将自动获取最新的快照（data-service:1.0-SNAPSHOT）。
+
+#### 4.5、metadata.xml
+Maven Repository Metadata is available in directories representing:
+
+- an un-versioned artifact: it gives informations about available versions of the artifact,
+- a snapshot artifact: it gives precise information on the snapshot,
+- a group containing Maven plugins artifacts: it gives informations on plugins available in this group.
+
+The metadata file name is:
+
+- maven-metadata.xml in a remote repository,
+- maven-metadata-<repo-id>.xml in a local repository, for metatada from a repository with repo-id identifier.
 
 ### 5、maven插件
 ---
@@ -262,7 +281,7 @@ Maven help 这个插件就是用来查询具体插件相关信息的，maven hel
     </profiles>  
 </project>  
 ```
-- The BaseBuild Element Set:
+##### 6.1.1、The BaseBuild Element Set
 ```xml
 <build>
   <defaultGoal>install</defaultGoal>
@@ -275,7 +294,7 @@ Maven help 这个插件就是用来查询具体插件相关信息的，maven hel
 </build>
 ```
 
-- Resources
+##### 6.1.2、Resources
 ```xml
  <build>
     ...
@@ -299,7 +318,45 @@ Maven help 这个插件就是用来查询具体插件相关信息的，maven hel
   </build>
 ```
 
-- Plugins和Plugin Management，pluginManagement的元素的配置和plugins的配置是一样的，只是这里的配置只是用于集成，在孩子POM中指定使用。
+*filtering*
+filtering是maven的resource插件提供的功能，作用是用环境变量、pom文件里定义的属性和指定配置文件里的属性替换属性(*.properties)文件里的占位符(${jdbc.url})，具体使用如下：
+在src/main/resources目录有个配置文件jdbc.properties，内容如下：
+
+```
+jdbc.url=${pom.jdbc.url}
+jdbc.username=${pom.jdbc.username}
+jdbc.passworkd=${pom.jdbc.password}
+```
+
+配置 resource 插件，启用filtering功能并添加属性到pom:
+
+```xml
+<project>
+    ... 
+    <properties>
+        <pom.jdbc.url>jdbc:mysql://127.0.0.1:3306/dev</pom.jdbc.url>
+        <pom.jdbc.username>root</pom.jdbc.username>
+        <pom.jdbc.password>123456</pom.jdbc.password>
+    </properties>
+    <build>
+      ...
+        <filters>
+            <filter>src/main/filters.properties</filter>
+        </filters>
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+          </resource>
+        </resources>
+        ...
+    </build>
+    ...
+</project>
+```
+
+##### 6.1.3、Plugins和Plugin Management
+pluginManagement的元素的配置和plugins的配置是一样的，只是这里的配置只是用于集成，在孩子POM中指定使用
 ```xml
 <build>
     ...
@@ -322,7 +379,7 @@ Maven help 这个插件就是用来查询具体插件相关信息的，maven hel
   </build>
 ```
 
-- The Build Element Set:
+##### 6.1.4、The Build Element Set:
 ```xml
  <build>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
@@ -457,6 +514,8 @@ user-parent的pom.xml详情如下:
 - 基于环境变量（用户 / 系统变量）
 - 操作系统配置（例如，Windows family）
 - 现存 / 缺失 文件
+
+#### 8.2、profile + filtering
 
 ### 9、demo
 ---
